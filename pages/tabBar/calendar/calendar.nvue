@@ -1,0 +1,28 @@
+<template>
+	<view>
+		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" />
+	</view>
+
+</template>
+
+<script>
+	import uniCalendar from '@/components/uni-calendar/uni-calendar.vue';
+	
+	export default {
+		components: {
+			uniCalendar
+		},
+		data() {
+			return {};
+		},
+		methods: {
+			change(e) {
+				console.log(e);
+			}
+		}
+	};
+</script>
+
+<style>
+
+</style>
