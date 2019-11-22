@@ -26,7 +26,13 @@ class Calendar {
 		// 每周日期
 		this.weeks = {}
 
-		this._getWeek(this.date.fullDate)
+		const preDate = this.getDate(this.date.fullDate, -1, 'month').fullDate
+		this.preweeks = this._getWeek(preDate).weeks
+		
+		const nextDate = this.getDate(this.date.fullDate, +1, 'month').fullDate
+		this.nextweeks = this._getWeek(nextDate).weeks
+		
+		this.weeks = this._getWeek(this.date.fullDate).weeks
 	}
 
 	/**
@@ -169,7 +175,13 @@ class Calendar {
 	 * @param {Object} date
 	 */
 	setDate(date) {
-		this._getWeek(date)
+		const preDate = this.getDate(date, -1, 'month').fullDate
+		this.preweeks = this._getWeek(preDate).weeks
+		
+		const nextDate = this.getDate(date, +1, 'month').fullDate
+		this.nextweeks = this._getWeek(nextDate).weeks
+		
+		this.weeks = this._getWeek(date).weeks
 	}
 	/**
 	 * 获取当前日期详情
@@ -246,7 +258,14 @@ class Calendar {
 	 */
 	setSelectInfo(data, value) {
 		this.selected = value
-		this._getWeek(data)
+		
+		const preDate = this.getDate(data, -1, 'month').fullDate
+		this.preweeks = this._getWeek(preDate).weeks
+		
+		const nextDate = this.getDate(data, +1, 'month').fullDate
+		this.nextweeks = this._getWeek(nextDate).weeks
+		
+		this.weeks = this._getWeek(data).weeks
 	}
 
 	/**
@@ -262,7 +281,14 @@ class Calendar {
 			this.multipleStatus.before = ''
 			this.multipleStatus.after = ''
 			this.multipleStatus.data = []
-			this._getWeek(fullDate)
+			
+			const preDate = this.getDate(fullDate, -1, 'month').fullDate
+			this.preweeks = this._getWeek(preDate).weeks
+			
+			const nextDate = this.getDate(fullDate, +1, 'month').fullDate
+			this.nextweeks = this._getWeek(nextDate).weeks
+			
+			this.weeks = this._getWeek(fullDate).weeks
 		} else {
 			if (!before) {
 				this.multipleStatus.before = fullDate
@@ -273,7 +299,13 @@ class Calendar {
 				} else {
 					this.multipleStatus.data = this.geDateAll(this.multipleStatus.after, this.multipleStatus.before);
 				}
-				this._getWeek(fullDate)
+				const preDate = this.getDate(fullDate, -1, 'month').fullDate
+				this.preweeks = this._getWeek(preDate).weeks
+				
+				const nextDate = this.getDate(fullDate, +1, 'month').fullDate
+				this.nextweeks = this._getWeek(nextDate).weeks
+				
+				this.weeks = this._getWeek(fullDate).weeks
 			}
 		}
 	}
@@ -296,7 +328,7 @@ class Calendar {
 			lastMonthDays: this._getLastMonthDays(firstDay, this.getDate(dateData)), // 上个月末尾几天
 			currentMonthDys: this._currentMonthDys(currentDay, this.getDate(dateData)), // 本月天数
 			nextMonthDays: [], // 下个月开始几天
-			weeks: []
+			weeks: [],
 		}
 		let canlender = []
 		const surplus = 42 - (dates.lastMonthDays.length + dates.currentMonthDys.length)
@@ -311,7 +343,9 @@ class Calendar {
 			weeks[parseInt(i / 7)][i % 7] = canlender[i]
 		}
 		this.canlender = canlender
-		this.weeks = weeks
+		return {
+			weeks
+		}
 	}
 
 	//静态方法

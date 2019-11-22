@@ -20,23 +20,42 @@
 				</view>
 				<text class="uni-calendar__backtoday" @click="backtoday">回到今天</text>
 			</view>
-			<swiper class="uni-swipper" :duration="400" :circular="true" @change="swiperChange" :current="currentIndex">
-				<swiper-item v-for="mIndex in 3" :key="mIndex">
-					<view class="uni-calendar__box">
-						<view class="uni-calendar__box-bg">
-							<text class="uni-calendar__box-bg-text">{{nowDate.month}}</text>
+			<view class="uni-calendar__weeks">
+				<view class="uni-calendar__weeks-header" v-for="(week,wIndex) in weekHeader" :key="wIndex">{{week}}</view>
+			</view>
+
+			<view class="uni-calendar__box">
+				<!-- <view class="uni-calendar__box-bg">
+					<text class="uni-calendar__box-bg-text">{{nowDate.month}}</text>
+				</view> -->
+				<swiper class="uni-swipper" :duration="350" :circular="true" :current="currentIndex" @change="swiperChange">
+					<!-- <swiper-item v-for="mIndex in 3" :key="mIndex"> -->
+					<swiper-item>
+						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in preweeks" :key="weekIndex">
+							<view class="uni-calendar__weeks-item" v-for="(preweeks,weeksIndex) in item" :key="weeksIndex">
+								<uni-calendar-item :weeks="preweeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
+							</view>
 						</view>
-						<view class="uni-calendar__weeks">
-							<view class="uni-calendar__weeks-header" v-for="(week,wIndex) in weekHeader" :key="wIndex">{{week}}</view>
-						</view>
+					</swiper-item>
+
+					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in weeks" :key="weekIndex">
 							<view class="uni-calendar__weeks-item" v-for="(weeks,weeksIndex) in item" :key="weeksIndex">
 								<uni-calendar-item :weeks="weeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
-					</view>
-				</swiper-item>
-			</swiper>
+					</swiper-item>
+
+					<swiper-item>
+						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in nextweeks" :key="weekIndex">
+							<view class="uni-calendar__weeks-item" v-for="(nextweeks,weeksIndex) in item" :key="weeksIndex">
+								<uni-calendar-item :weeks="nextweeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
+							</view>
+						</view>
+					</swiper-item>
+				</swiper>
+			</view>
+
 		</view>
 		<w-picker mode="yearMonth" endYear="9999" :current="true" @confirm="onConfirm" ref="yearMonth" themeColor="#24CACA"></w-picker>
 	</view>
@@ -106,9 +125,11 @@
 		},
 		data() {
 			return {
-				lastIndex: 0,
-				currentIndex: 0,
+				lastIndex: 1,
+				currentIndex: 1,
 				show: false,
+				preweeks: [],
+				nextweeks: [],
 				weeks: [],
 				weekHeader: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
 				calendar: {},
@@ -118,8 +139,12 @@
 		},
 		watch: {
 			selected(newVal) {
-				this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
-				this.weeks = this.cale.weeks
+
+				// this.nowDate = this.calendar = this.cale.getInfo(newVal.date)
+				// this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
+				// this.preweeks = this.cale.preweeks
+				// this.nextweeks = this.cale.nextweeks
+				// this.weeks = this.cale.weeks
 			}
 		},
 		created() {
@@ -139,6 +164,9 @@
 			// 取消穿透
 			clean() {},
 			init(date) {
+				this.months = this.cale.months;
+				this.preweeks = this.cale.preweeks
+				this.nextweeks = this.cale.nextweeks
 				this.weeks = this.cale.weeks
 				this.nowDate = this.calendar = this.cale.getInfo(date)
 			},
@@ -185,36 +213,70 @@
 			},
 			choiceDate(weeks) {
 				if (weeks.disable) return
-				this.calendar = weeks
+				this.nowDate = this.calendar = weeks
 				// 设置多选
-				this.cale.setMultiple(this.calendar.fullDate)
-				this.weeks = this.cale.weeks
+				// this.cale.setMultiple(this.calendar.fullDate)
+				// this.preweeks = this.cale.preweeks
+				// this.nextweeks = this.cale.nextweeks
+				// this.weeks = this.cale.weeks
 				this.change()
 			},
 			backtoday() {
-				this.cale.setDate(this.date)
-				this.weeks = this.cale.weeks
-				this.nowDate = this.calendar = this.cale.getInfo(this.date)
+				// this.lastIndex = 1
+				// this.currentIndex = 1
+				this.setDate(new Date())
+				this.nowDate = this.calendar = this.cale.getInfo(new Date())
 				this.change()
 			},
 			pre() {
-				const preDate = this.cale.getDate(this.nowDate.fullDate, -1, 'month').fullDate
-				this.setDate(preDate)
+				const {
+					fullDate,
+					year,
+					month,
+					date,
+					day
+				} = this.cale.getDate(this.nowDate.fullDate, -1, 'month')
 
+				const preDate = new Date(year, month - 1, 1)
+				// this.setDate(preDate)
+				this.setDate(preDate)
+				this.change()
 			},
 			next() {
-				const nextDate = this.cale.getDate(this.nowDate.fullDate, +1, 'month').fullDate
+				const {
+					fullDate,
+					year,
+					month,
+					date,
+					day
+				} = this.cale.getDate(this.nowDate.fullDate, +1, 'month')
+
+				const nextDate = new Date(year, month - 1, 1)
 				this.setDate(nextDate)
+				this.change()
 			},
 			setDate(date) {
 				this.cale.setDate(date)
-				this.weeks = this.cale.weeks
-				console.log(this.weeks)
+				if (this.currentIndex == 1) {
+					this.preweeks = this.cale.preweeks
+					this.nextweeks = this.cale.nextweeks
+					this.weeks = this.cale.weeks
+				} else if (this.currentIndex == 0) {
+					this.preweeks = this.cale.weeks
+					this.nextweeks = this.cale.preweeks
+					this.weeks = this.cale.nextweeks
+				} else if (this.currentIndex == 2) {
+					this.preweeks = this.cale.nextweeks
+					this.nextweeks = this.cale.weeks
+					this.weeks = this.cale.preweeks
+				}
 				this.nowDate = this.cale.getInfo(date)
 			},
 			swiperChange(e) {
 				let index = e.target.current;
-				let isPrev = (index - this.lastIndex == 1 || index - this.lastIndex == -2) ? false : true;
+				console.log(index);
+
+				let isPrev = (index - this.lastIndex == -1 || index - this.lastIndex == 2) ? true : false;
 				this.currentIndex = index;
 				if (isPrev) {
 					this.pre();
@@ -224,15 +286,8 @@
 				this.lastIndex = index;
 			},
 			onConfirm(val) {
-				const selectDate = this.cale.getDate(val.result).fullDate
+				const selectDate = new Date(val.checkArr[0] + '-' + val.checkArr[1] + '-01');
 				this.setDate(selectDate)
-				// console.log(val);
-				//如果页面需要调用多个mode类型，可以根据mode处理结果渲染到哪里;
-				// switch(this.mode){
-				// 	case "date":
-				// 		break;
-				// }
-				// this.resultInfo = val;
 			},
 			showPicker() {
 				this.$refs["yearMonth"].show();

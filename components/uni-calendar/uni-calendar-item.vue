@@ -125,6 +125,7 @@
 
 	.uni-calendar-item--isDay-text {
 		color: $uni-color-primary;
+		font-size: $uni-font-size-sm-today;
 	}
 
 	.uni-calendar-item--isDay {
