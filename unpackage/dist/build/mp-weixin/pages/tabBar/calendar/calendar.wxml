@@ -1,0 +1,1 @@
+<block wx:if="{{showCalendar}}"><view><uni-calendar class="vue-ref" vue-id="1" insert="{{true}}" lunar="{{true}}" data-ref="calendar" data-event-opts="{{[['^change',[['change']]]]}}" bind:change="__e" bind:__l="__l"></uni-calendar></view></block>

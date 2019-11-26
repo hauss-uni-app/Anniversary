@@ -33,7 +33,7 @@
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in preweeks" :key="weekIndex">
 							<view class="uni-calendar__weeks-item" v-for="(preweeks,weeksIndex) in item" :key="weeksIndex">
-								<uni-calendar-item :weeks="preweeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
+								<uni-calendar-item :weeks="preweeks" :calendar="precalendar" :lunar="lunar" @click="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
 					</swiper-item>
@@ -41,7 +41,7 @@
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in weeks" :key="weekIndex">
 							<view class="uni-calendar__weeks-item" v-for="(weeks,weeksIndex) in item" :key="weeksIndex">
-								<uni-calendar-item :weeks="weeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
+								<uni-calendar-item :weeks="weeks" :calendar="calendar" :lunar="lunar" @click="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
 					</swiper-item>
@@ -49,7 +49,7 @@
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in nextweeks" :key="weekIndex">
 							<view class="uni-calendar__weeks-item" v-for="(nextweeks,weeksIndex) in item" :key="weeksIndex">
-								<uni-calendar-item :weeks="nextweeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
+								<uni-calendar-item :weeks="nextweeks" :calendar="nextcalendar" :lunar="lunar" @click="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
 					</swiper-item>
@@ -57,7 +57,7 @@
 			</view>
 
 		</view>
-		<w-picker mode="yearMonth" endYear="9999" :current="true" @confirm="onConfirm" ref="yearMonth" themeColor="#24CACA"></w-picker>
+		<w-picker mode="yearMonth" endYear="2100" :current="true" @confirm="onConfirm" ref="yearMonth" themeColor="#24CACA"></w-picker>
 	</view>
 </template>
 
@@ -132,14 +132,16 @@
 				nextweeks: [],
 				weeks: [],
 				weekHeader: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+				precalendar: {},
 				calendar: {},
+				nextcalendar: {},
 				nowDate: '',
 				aniMaskShow: false
 			}
 		},
 		watch: {
 			selected(newVal) {
-
+				console.log("selected");
 				// this.nowDate = this.calendar = this.cale.getInfo(newVal.date)
 				// this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
 				// this.preweeks = this.cale.preweeks
@@ -165,10 +167,15 @@
 			clean() {},
 			init(date) {
 				this.months = this.cale.months;
-				this.preweeks = this.cale.preweeks
-				this.nextweeks = this.cale.nextweeks
+
 				this.weeks = this.cale.weeks
 				this.nowDate = this.calendar = this.cale.getInfo(date)
+				this.$nextTick(function() {
+					this.preweeks = this.cale.preweeks
+					this.nextweeks = this.cale.nextweeks
+					this.precalendar = this.calendar
+					this.nextcalendar = this.calendar
+				})
 			},
 			open() {
 				this.show = true
@@ -213,19 +220,27 @@
 			},
 			choiceDate(weeks) {
 				if (weeks.disable) return
-				this.nowDate = this.calendar = weeks
+
+				if (this.currentIndex == 0)
+					this.nowDate = this.precalendar = weeks
+				if (this.currentIndex == 1)
+					this.nowDate = this.calendar = weeks
+				if (this.currentIndex == 2)
+					this.nowDate = this.nextcalendar = weeks
+
 				// 设置多选
 				// this.cale.setMultiple(this.calendar.fullDate)
 				// this.preweeks = this.cale.preweeks
 				// this.nextweeks = this.cale.nextweeks
 				// this.weeks = this.cale.weeks
-				this.change()
+				// this.change()
 			},
 			backtoday() {
 				// this.lastIndex = 1
 				// this.currentIndex = 1
 				this.setDate(new Date())
-				this.nowDate = this.calendar = this.cale.getInfo(new Date())
+				// this.nowDate = this.calendar = this.cale.getInfo(new Date())
+				this.choiceDate(this.cale.getInfo(new Date()))
 				this.change()
 			},
 			pre() {
@@ -238,7 +253,6 @@
 				} = this.cale.getDate(this.nowDate.fullDate, -1, 'month')
 
 				const preDate = new Date(year, month - 1, 1)
-				// this.setDate(preDate)
 				this.setDate(preDate)
 				this.change()
 			},
@@ -256,21 +270,45 @@
 				this.change()
 			},
 			setDate(date) {
+				var preweeks = []
+				var nextweeks = []
+				var weeks = []
 				this.cale.setDate(date)
+				
 				if (this.currentIndex == 1) {
-					this.preweeks = this.cale.preweeks
-					this.nextweeks = this.cale.nextweeks
-					this.weeks = this.cale.weeks
+					preweeks = this.cale.preweeks
+					nextweeks = this.cale.nextweeks
+					weeks = this.cale.weeks
+					this.nowDate = this.calendar = this.cale.getInfo(date)
+					this.weeks = weeks
+					this.$nextTick(function() {
+						this.preweeks = preweeks
+						this.nextweeks = nextweeks
+					})
 				} else if (this.currentIndex == 0) {
-					this.preweeks = this.cale.weeks
-					this.nextweeks = this.cale.preweeks
-					this.weeks = this.cale.nextweeks
+					preweeks = this.cale.weeks
+					nextweeks = this.cale.preweeks
+					weeks = this.cale.nextweeks
+					this.nowDate= this.precalendar = this.cale.getInfo(date)
+					this.preweeks = preweeks
+					this.$nextTick(function() {
+						this.weeks = weeks
+						this.nextweeks = nextweeks
+					})
 				} else if (this.currentIndex == 2) {
-					this.preweeks = this.cale.nextweeks
-					this.nextweeks = this.cale.weeks
-					this.weeks = this.cale.preweeks
+					preweeks = this.cale.nextweeks
+					nextweeks = this.cale.weeks
+					weeks = this.cale.preweeks
+					this.nowDate= this.nextcalendar = this.cale.getInfo(date)
+					this.nextweeks = nextweeks
+					this.$nextTick(function() {
+						this.weeks = weeks
+						this.preweeks = preweeks
+					})
 				}
-				this.nowDate = this.cale.getInfo(date)
+				
+				
+
 			},
 			swiperChange(e) {
 				let index = e.target.current;

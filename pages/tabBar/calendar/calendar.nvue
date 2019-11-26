@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view v-if="showCalendar">
 		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" />
 	</view>
 
@@ -7,13 +7,21 @@
 
 <script>
 	import uniCalendar from '@/components/uni-calendar/uni-calendar.vue';
-	
+
 	export default {
 		components: {
 			uniCalendar
 		},
 		data() {
-			return {};
+			return {
+				showCalendar: false
+			}
+		},
+		onReady() {
+			this.$nextTick(() => {
+				this.showCalendar = true
+				console.log("$nextTick");
+			})
 		},
 		methods: {
 			change(e) {

@@ -68,7 +68,7 @@
 		},
 		methods: {
 			choiceDate(weeks) {
-				this.$emit('change', weeks)
+				this.$emit('click', weeks)
 			}
 		}
 	}
