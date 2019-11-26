@@ -233,7 +233,7 @@
 				// this.preweeks = this.cale.preweeks
 				// this.nextweeks = this.cale.nextweeks
 				// this.weeks = this.cale.weeks
-				// this.change()
+				this.$nextTick(function() {this.change()});
 			},
 			backtoday() {
 				// this.lastIndex = 1
@@ -254,7 +254,7 @@
 
 				const preDate = new Date(year, month - 1, 1)
 				this.setDate(preDate)
-				this.change()
+				// this.change()
 			},
 			next() {
 				const {
@@ -267,7 +267,7 @@
 
 				const nextDate = new Date(year, month - 1, 1)
 				this.setDate(nextDate)
-				this.change()
+				// this.change()
 			},
 			setDate(date) {
 				var preweeks = []

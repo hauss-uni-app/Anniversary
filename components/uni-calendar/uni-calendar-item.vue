@@ -133,6 +133,11 @@
 		opacity: 0.8;
 		color: #fff;
 		border-radius: 50% 0 50% 0;
+		transition: all 0.2s ease 0.1s;
+	}
+	
+	.uni-calendar-item--isDay:hover {
+		border-radius: 50% 0 50% 0;
 	}
 
 	.uni-calendar-item--extra {
@@ -144,6 +149,11 @@
 		background-color: $uni-color-primary;
 		color: #fff;
 		opacity: 0.8;
+		border-radius: 50% 0 50% 0;
+		transition: all 0.2s ease 0.1s;
+	}
+
+	.uni-calendar-item--checked:hover {
 		border-radius: 50% 0 50% 0;
 	}
 

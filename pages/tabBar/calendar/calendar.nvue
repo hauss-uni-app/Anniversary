@@ -1,6 +1,6 @@
 <template>
 	<view v-if="showCalendar">
-		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" />
+		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected"/>
 	</view>
 
 </template>
@@ -14,7 +14,32 @@
 		},
 		data() {
 			return {
-				showCalendar: false
+				showCalendar: false,
+				selected: [{
+						date: '2019-08-20',
+						info: '打卡'
+					},
+					{
+						date: '2019-08-21',
+						info: '签到',
+						data: {
+							custom: '自定义信息',
+							name: '自定义消息头'
+						}
+					},
+					{
+						date: '2019-08-22',
+						info: '已打卡'
+					},
+					{
+						date: '2019-11-21',
+						info: '签到',
+						data: {
+							custom: '自定义信息',
+							name: '自定义消息头'
+						}
+					}
+				]
 			}
 		},
 		onReady() {
