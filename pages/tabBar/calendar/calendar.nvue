@@ -1,8 +1,9 @@
 <template>
 	<view v-if="showCalendar">
-		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected"/>
+		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected" />
+		<button type="primary" @click="togglePopup('bottom', 'popup')">底部弹出 popup</button>
+		<uni-popup ref="showpopup" :type="type" @change="change"><text class="popup-content">{{ content }}</text></uni-popup>
 	</view>
-	<uni-popup :show="showpopup" :type="type" @change="change"><text class="popup-content">{{ content }}</text></uni-popup>
 </template>
 
 <script>
@@ -10,10 +11,13 @@
 	import uniPopup from '@/components/uni-popup/uni-popup.vue';
 	export default {
 		components: {
-			uniCalendar
+			uniCalendar,
+			uniPopup
 		},
 		data() {
 			return {
+				content: 'aaaaaaaaaaaa',
+				type: 'bottom',
 				showCalendar: false,
 				selected: [{
 						date: '2019-08-20',
@@ -33,7 +37,15 @@
 					},
 					{
 						date: '2019-11-21',
-						info: '签到',
+						info: '签到2',
+						data: {
+							custom: '自定义信息',
+							name: '自定义消息头'
+						}
+					},
+					{
+						date: '2019-11-21',
+						info: '签到1',
 						data: {
 							custom: '自定义信息',
 							name: '自定义消息头'
@@ -45,17 +57,46 @@
 		onReady() {
 			this.$nextTick(() => {
 				this.showCalendar = true
+				// this.$refs['showpopup'].open()
+				// this.togglePopup('bottom', 'popup')
 				console.log("$nextTick");
 			})
 		},
 		methods: {
 			change(e) {
 				console.log(e);
+				if (e.extraInfo != undefined)
+					this.content = e.extraInfo.info
+			},
+			togglePopup(type, open) {
+				switch (type) {
+					case 'top':
+						this.content = '顶部弹出 popup'
+						break
+
+					case 'bottom':
+						this.content = '底部弹出 popup'
+						break
+					case 'center':
+						this.content = '居中弹出 popup'
+						break
+				}
+				this.type = type
+				this.$nextTick(() => {
+					this.$refs['show' + open].open()
+				})
 			}
 		}
 	};
 </script>
 
 <style>
-
+	.popup-content {
+		/* #ifndef APP-NVUE */
+		display: block;
+		/* #endif */
+		background-color: #fff;
+		padding: 15px;
+		font-size: 14px;
+	}
 </style>
