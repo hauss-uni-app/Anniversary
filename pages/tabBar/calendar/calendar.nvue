@@ -2,12 +2,12 @@
 	<view v-if="showCalendar">
 		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected"/>
 	</view>
-
+	<uni-popup :show="showpopup" :type="type" @change="change"><text class="popup-content">{{ content }}</text></uni-popup>
 </template>
 
 <script>
 	import uniCalendar from '@/components/uni-calendar/uni-calendar.vue';
-
+	import uniPopup from '@/components/uni-popup/uni-popup.vue';
 	export default {
 		components: {
 			uniCalendar
