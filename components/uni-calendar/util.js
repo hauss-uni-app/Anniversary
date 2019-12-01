@@ -28,10 +28,10 @@ class Calendar {
 
 		const preDate = this.getDate(this.date.fullDate, -1, 'month').fullDate
 		this.preweeks = this._getWeek(preDate).weeks
-		
+
 		const nextDate = this.getDate(this.date.fullDate, +1, 'month').fullDate
 		this.nextweeks = this._getWeek(nextDate).weeks
-		
+
 		this.weeks = this._getWeek(this.date.fullDate).weeks
 	}
 
@@ -104,12 +104,13 @@ class Calendar {
 			// 是否今天
 			let isDay = fullDate === nowDate
 			// 获取打点信息
-			let info = this.selected && this.selected.find((item) => {
-				if (this.dateEqual(nowDate, item.date)) {
-					return item
-				}
-			})
-
+			// let info = this.selected && this.selected.find((item) => {
+			// 	if (this.dateEqual(nowDate, item.date)) {
+			// 		return item
+			// 	}
+			// })
+			// console.log(this.selected.find(item => this.dateEqual(nowDate, item.date) === true))
+			let info = this.selected && this.selected.find(item => this.dateEqual(nowDate, item.date) === true)
 			// 日期禁用
 			let disableBefore = true
 			let disableAfter = true
@@ -177,10 +178,10 @@ class Calendar {
 	setDate(date) {
 		const preDate = this.getDate(date, -1, 'month').fullDate
 		this.preweeks = this._getWeek(preDate).weeks
-		
+
 		const nextDate = this.getDate(date, +1, 'month').fullDate
 		this.nextweeks = this._getWeek(nextDate).weeks
-		
+
 		this.weeks = this._getWeek(date).weeks
 	}
 	/**
@@ -258,13 +259,13 @@ class Calendar {
 	 */
 	setSelectInfo(data, value) {
 		this.selected = value
-		
+
 		const preDate = this.getDate(data, -1, 'month').fullDate
 		this.preweeks = this._getWeek(preDate).weeks
-		
+
 		const nextDate = this.getDate(data, +1, 'month').fullDate
 		this.nextweeks = this._getWeek(nextDate).weeks
-		
+
 		this.weeks = this._getWeek(data).weeks
 	}
 
@@ -281,13 +282,13 @@ class Calendar {
 			this.multipleStatus.before = ''
 			this.multipleStatus.after = ''
 			this.multipleStatus.data = []
-			
+
 			const preDate = this.getDate(fullDate, -1, 'month').fullDate
 			this.preweeks = this._getWeek(preDate).weeks
-			
+
 			const nextDate = this.getDate(fullDate, +1, 'month').fullDate
 			this.nextweeks = this._getWeek(nextDate).weeks
-			
+
 			this.weeks = this._getWeek(fullDate).weeks
 		} else {
 			if (!before) {
@@ -301,10 +302,10 @@ class Calendar {
 				}
 				const preDate = this.getDate(fullDate, -1, 'month').fullDate
 				this.preweeks = this._getWeek(preDate).weeks
-				
+
 				const nextDate = this.getDate(fullDate, +1, 'month').fullDate
 				this.nextweeks = this._getWeek(nextDate).weeks
-				
+
 				this.weeks = this._getWeek(fullDate).weeks
 			}
 		}

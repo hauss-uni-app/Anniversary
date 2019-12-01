@@ -1,7 +1,7 @@
 <template>
 	<view class="uni-section">
 		<view v-if="type" class="uni-section__head">
-			<view :class="type" class="uni-section__head-tag" />
+			<view :class="type" />
 		</view>
 		<view class="uni-section__content">
 			<text :class="{'distraction':!subTitle}" class="uni-section__content-title">{{ title }}</text>
@@ -29,7 +29,9 @@
 			}
 		},
 		data() {
-			return {}
+			return {
+				isActive: true
+			}
 		},
 		watch: {
 			title(newVal) {
@@ -50,15 +52,15 @@
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		margin-top: 10px;
+		/* margin-top: 10px; */
 		flex-direction: row;
 		align-items: center;
 		padding: 0 10px;
 		height: 50px;
-		background-color: #f8f8f8;
+		background-color: #c0c0c00d;
 		border-bottom-color: #e5e5e5;
 		border-bottom-style: solid;
-		border-bottom-width: 1px;
+		/* border-bottom-width: 1px; */
 		font-weight: normal;
 	}
 
@@ -69,9 +71,14 @@
 		margin-right: 10px;
 	}
 
+	.uni-section:active {
+		background-color: #24caca54;
+
+	}
+
 	.line {
 		height: 15px;
-		background-color: #c0c0c0;
+		background-color: #24CACA;
 		border-radius: 5px;
 		width: 3px;
 	}
@@ -104,5 +111,9 @@
 	.uni-section__content-sub {
 		font-size: 24rpx;
 		color: #999;
+	}
+
+	.uni-section__content-sub:active {
+		color: #fff;
 	}
 </style>

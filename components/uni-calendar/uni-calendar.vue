@@ -28,12 +28,11 @@
 				<!-- <view class="uni-calendar__box-bg">
 					<text class="uni-calendar__box-bg-text">{{nowDate.month}}</text>
 				</view> -->
-				<swiper class="uni-swipper" :duration="350" :circular="true" :current="currentIndex" @change="swiperChange">
-					<!-- <swiper-item v-for="mIndex in 3" :key="mIndex"> -->
+				<swiper class="uni-swipper" :duration="800" :circular="true" :current="currentIndex" @change="swiperChange">
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in preweeks" :key="weekIndex">
-							<view class="uni-calendar__weeks-item" v-for="(preweeks,weeksIndex) in item" :key="weeksIndex">
-								<uni-calendar-item :weeks="preweeks" :calendar="precalendar" :lunar="lunar" @click="choiceDate"></uni-calendar-item>
+							<view class="uni-calendar__weeks-item" v-for="(preweeks,preweeksIndex) in item" :key="preweeksIndex">
+								<uni-calendar-item :weeks="preweeks" :calendar="precalendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
 					</swiper-item>
@@ -41,15 +40,15 @@
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in weeks" :key="weekIndex">
 							<view class="uni-calendar__weeks-item" v-for="(weeks,weeksIndex) in item" :key="weeksIndex">
-								<uni-calendar-item :weeks="weeks" :calendar="calendar" :lunar="lunar" @click="choiceDate"></uni-calendar-item>
+								<uni-calendar-item :weeks="weeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
 					</swiper-item>
 
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in nextweeks" :key="weekIndex">
-							<view class="uni-calendar__weeks-item" v-for="(nextweeks,weeksIndex) in item" :key="weeksIndex">
-								<uni-calendar-item :weeks="nextweeks" :calendar="nextcalendar" :lunar="lunar" @click="choiceDate"></uni-calendar-item>
+							<view class="uni-calendar__weeks-item" v-for="(nextweeks,nextweeksIndex) in item" :key="nextweeksIndex">
+								<uni-calendar-item :weeks="nextweeks" :calendar="nextcalendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
 					</swiper-item>
@@ -191,15 +190,15 @@
 					}, 300)
 				})
 			},
-			confirm() {
-				this.setEmit('confirm')
-				this.close()
+			// confirm() {
+			// 	this.setEmit('confirm')
+			// 	this.close()
+			// },
+			change(weeks) {
+				this.setEmit('change',weeks)
 			},
-			change() {
-				if (!this.insert) return
-				this.setEmit('change')
-			},
-			setEmit(name) {
+			setEmit(name,weeks) {
+				console.log(weeks)
 				let {
 					year,
 					month,
@@ -207,7 +206,7 @@
 					fullDate,
 					lunar,
 					extraInfo
-				} = this.calendar
+				} = weeks
 				this.$emit(name, {
 					range: this.cale.multipleStatus,
 					year,
@@ -219,29 +218,21 @@
 				})
 			},
 			choiceDate(weeks) {
+				// console.log(weeks)
 				if (weeks.disable) return
 
-				if (this.currentIndex == 0)
-					this.nowDate = this.precalendar = weeks
-				if (this.currentIndex == 1)
-					this.nowDate = this.calendar = weeks
-				if (this.currentIndex == 2)
-					this.nowDate = this.nextcalendar = weeks
-
-				// 设置多选
-				// this.cale.setMultiple(this.calendar.fullDate)
-				// this.preweeks = this.cale.preweeks
-				// this.nextweeks = this.cale.nextweeks
-				// this.weeks = this.cale.weeks
-				this.$nextTick(function() {this.change()});
+				 this.$nextTick(function() {
+					 if (this.currentIndex == 0)
+					 	this.nowDate = this.precalendar = weeks
+					 if (this.currentIndex == 1)
+					 	this.nowDate = this.calendar = weeks
+					 if (this.currentIndex == 2)
+					 	this.nowDate = this.nextcalendar = weeks
+					this.change(weeks)
+				 });
 			},
 			backtoday() {
-				// this.lastIndex = 1
-				// this.currentIndex = 1
 				this.setDate(new Date())
-				// this.nowDate = this.calendar = this.cale.getInfo(new Date())
-				this.choiceDate(this.cale.getInfo(new Date()))
-				this.change()
 			},
 			pre() {
 				const {
@@ -254,7 +245,6 @@
 
 				const preDate = new Date(year, month - 1, 1)
 				this.setDate(preDate)
-				// this.change()
 			},
 			next() {
 				const {
@@ -267,14 +257,13 @@
 
 				const nextDate = new Date(year, month - 1, 1)
 				this.setDate(nextDate)
-				// this.change()
 			},
 			setDate(date) {
 				var preweeks = []
 				var nextweeks = []
 				var weeks = []
 				this.cale.setDate(date)
-				
+
 				if (this.currentIndex == 1) {
 					preweeks = this.cale.preweeks
 					nextweeks = this.cale.nextweeks
@@ -282,6 +271,7 @@
 					this.nowDate = this.calendar = this.cale.getInfo(date)
 					this.weeks = weeks
 					this.$nextTick(function() {
+						this.change(this.calendar)
 						this.preweeks = preweeks
 						this.nextweeks = nextweeks
 					})
@@ -289,9 +279,10 @@
 					preweeks = this.cale.weeks
 					nextweeks = this.cale.preweeks
 					weeks = this.cale.nextweeks
-					this.nowDate= this.precalendar = this.cale.getInfo(date)
+					this.nowDate = this.precalendar = this.cale.getInfo(date)
 					this.preweeks = preweeks
 					this.$nextTick(function() {
+						this.change(this.precalendar)
 						this.weeks = weeks
 						this.nextweeks = nextweeks
 					})
@@ -299,20 +290,18 @@
 					preweeks = this.cale.nextweeks
 					nextweeks = this.cale.weeks
 					weeks = this.cale.preweeks
-					this.nowDate= this.nextcalendar = this.cale.getInfo(date)
+					this.nowDate = this.nextcalendar = this.cale.getInfo(date)
 					this.nextweeks = nextweeks
 					this.$nextTick(function() {
+						this.change(this.nextcalendar)
 						this.weeks = weeks
 						this.preweeks = preweeks
 					})
 				}
-				
-				
-
 			},
 			swiperChange(e) {
 				let index = e.target.current;
-				console.log(index);
+				// console.log(e);
 
 				let isPrev = (index - this.lastIndex == -1 || index - this.lastIndex == 2) ? true : false;
 				this.currentIndex = index;
@@ -424,13 +413,15 @@
 		font-size: 12px;
 		border-top-left-radius: 25px;
 		border-bottom-left-radius: 25px;
-		color: $uni-text-color;
-		background-color: $uni-bg-color-hover;
+		color: #333;
+		background-color: #f1f1f1;
+		// align-items: center;
+		// -webkit-box-pack: center;
 	}
 
 	.uni-calendar__header-text {
 		text-align: center;
-		width: 100px;
+		// width: 100px;
 		font-size: $uni-font-size-base;
 		color: $uni-text-color;
 	}
@@ -515,7 +506,7 @@
 	}
 
 	.uni-swipper {
-		height: 329px;
+		height: 500rpx;
 	}
 
 	.uni-calendar-item__weeks-box {

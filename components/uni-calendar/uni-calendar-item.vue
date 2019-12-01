@@ -68,7 +68,8 @@
 		},
 		methods: {
 			choiceDate(weeks) {
-				this.$emit('click', weeks)
+				// console.log(weeks)
+				this.$emit('change', weeks)
 			}
 		}
 	}
@@ -135,7 +136,7 @@
 		border-radius: 50% 0 50% 0;
 		transition: all 0.2s ease 0.1s;
 	}
-	
+
 	.uni-calendar-item--isDay:hover {
 		border-radius: 50% 0 50% 0;
 	}
