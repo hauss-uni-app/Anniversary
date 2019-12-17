@@ -2,14 +2,9 @@
 	<view v-if="showCalendar">
 		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected" />
 		<view class="content">
-			<!-- <view v-for="(item, index) in itemArr" :key="index"> -->
-			<uni-section  v-if="showSection" :title="itemArr" :subTitle="itemArr" type="line"></uni-section>
-			<!-- 			<uni-section title="自定义弹出层1" subTitle="aa" type="line"></uni-section>
-			<uni-section title="自定义弹出层2" type="line"></uni-section>
-			<uni-section title="自定义弹出层3" type="line"></uni-section>
-			<uni-section title="自定义弹出层4" type="line"></uni-section>
-			<uni-section title="自定义弹出层5" type="line"></uni-section> -->
-			<!-- </view> -->
+			<view v-for="(item, index) in itemArr" :key="index">
+			<uni-section  v-if="showSection" :title="item.info" :subTitle="item.days" type="line"></uni-section>
+			</view>
 		</view>
 	</view>
 </template>
@@ -31,35 +26,48 @@
 				showCalendar: false,
 				selected: [{
 						date: '2019-08-20',
-						info: '打卡'
+						info: '打卡',
+						days: '100'
 					},
 					{
 						date: '2019-08-21',
 						info: '签到',
-						data: {
-							custom: '自定义信息',
-							name: '自定义消息头'
-						}
+						days: '100'
 					},
 					{
 						date: '2019-08-22',
-						info: '已打卡'
+						info: '已打卡',
+						days: '100'
 					},
 					{
 						date: '2019-11-21',
 						info: '签到2',
-						data: {
-							custom: '自定义信息',
-							name: '自定义消息头'
-						}
+						days: '100'
 					},
 					{
 						date: '2019-11-21',
 						info: '签到1',
-						data: {
-							custom: '自定义信息',
-							name: '自定义消息头'
-						}
+						days: '100'
+					},
+					{
+						date: '2019-11-21',
+						info: '签到2',
+						days: '100'
+					},
+					{
+						date: '2019-11-21',
+						info: '签到1',
+						days: '100'
+					},
+					{
+						date: '2019-11-21',
+						info: '签到2',
+						days: '100'
+					},
+					{
+						date: '2019-11-21',
+						info: '签到1',
+						days: '100'
 					}
 				]
 			}
@@ -73,9 +81,9 @@
 		methods: {
 			change(e) {
 				this.showSection = false
-				if (e.extraInfo.info != undefined) {
+				if (e.extraInfo != undefined) {
 					this.showSection = true
-					this.itemArr = e.extraInfo.info
+					this.itemArr = e.extraInfo
 					console.log(this.itemArr)
 				}
 			},

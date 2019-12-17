@@ -104,13 +104,10 @@ class Calendar {
 			// 是否今天
 			let isDay = fullDate === nowDate
 			// 获取打点信息
-			// let info = this.selected && this.selected.find((item) => {
-			// 	if (this.dateEqual(nowDate, item.date)) {
-			// 		return item
-			// 	}
-			// })
-			// console.log(this.selected.find(item => this.dateEqual(nowDate, item.date) === true))
-			let info = this.selected && this.selected.find(item => this.dateEqual(nowDate, item.date) === true)
+			let info = null
+			let setSelectInfo = this.selected.filter(item => this.dateEqual(nowDate, item.date) === true)
+			if (setSelectInfo.length > 0)
+				info = setSelectInfo
 			// 日期禁用
 			let disableBefore = true
 			let disableAfter = true
