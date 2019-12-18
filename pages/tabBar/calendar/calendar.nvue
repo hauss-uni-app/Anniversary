@@ -14,7 +14,8 @@
 	import uniSection from '@/components/uni-section/uni-section.vue'
 	import {
 		mapState,
-		mapMutations
+		mapMutations,
+		mapActions
 	} from 'vuex'
 	
 	export default {
@@ -37,18 +38,18 @@
 		onReady() {
 			this.$nextTick(() => {
 				this.showCalendar = true			
-				this.getCurrentMonthSelected();
+				this.getCurrentMonthSelected(1)
 				console.log("$nextTick");
 			})
 		},
 		methods: {
-			 ...mapMutations(['getCurrentMonthSelected']),
+			 ...mapActions(['getCurrentMonthSelected']),
 			change(e) {
 				this.showSection = false
 				if (e.extraInfo != undefined) {
 					this.showSection = true
 					this.itemArr = e.extraInfo
-					console.log(this.itemArr)
+					console.log(e)
 				}
 			},
 

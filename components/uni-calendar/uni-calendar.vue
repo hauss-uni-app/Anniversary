@@ -66,7 +66,8 @@
 	import wPicker from "@/components/w-picker/w-picker.vue";
 	import {
 		mapState,
-		mapMutations
+		mapMutations,
+		mapActions
 	} from 'vuex'
 	export default {
 		components: {
@@ -146,14 +147,14 @@
 			...mapState(['selected'])
 		},
 		watch: {
-			selected(newVal) {
-				console.log("selected");
-				// this.nowDate = this.calendar = this.cale.getInfo(newVal.date)
-				// this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
-				// this.preweeks = this.cale.preweeks
-				// this.nextweeks = this.cale.nextweeks
-				// this.weeks = this.cale.weeks
-			}
+			// selected(newVal) {
+			// 	console.log("selected");
+			// 	// this.nowDate = this.calendar = this.cale.getInfo(newVal.date)
+			// 	// this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
+			// 	// this.preweeks = this.cale.preweeks
+			// 	// this.nextweeks = this.cale.nextweeks
+			// 	// this.weeks = this.cale.weeks
+			// }
 		},
 		created() {
 			// 获取日历方法实例
@@ -169,6 +170,7 @@
 
 		},
 		methods: {
+			...mapActions(['getCurrentMonthSelected']),
 			// 取消穿透
 			clean() {},
 			init(date) {
@@ -202,9 +204,9 @@
 			// 	this.close()
 			// },
 			change(weeks) {
-				this.setEmit('change',weeks)
+				this.setEmit('change', weeks)
 			},
-			setEmit(name,weeks) {
+			setEmit(name, weeks) {
 				console.log(weeks)
 				let {
 					year,
@@ -228,15 +230,15 @@
 				// console.log(weeks)
 				if (weeks.disable) return
 
-				 this.$nextTick(function() {
-					 if (this.currentIndex == 0)
-					 	this.nowDate = this.precalendar = weeks
-					 if (this.currentIndex == 1)
-					 	this.nowDate = this.calendar = weeks
-					 if (this.currentIndex == 2)
-					 	this.nowDate = this.nextcalendar = weeks
+				this.$nextTick(function() {
+					if (this.currentIndex == 0)
+						this.nowDate = this.precalendar = weeks
+					if (this.currentIndex == 1)
+						this.nowDate = this.calendar = weeks
+					if (this.currentIndex == 2)
+						this.nowDate = this.nextcalendar = weeks
 					this.change(weeks)
-				 });
+				});
 			},
 			backtoday() {
 				this.setDate(new Date())
@@ -305,6 +307,15 @@
 						this.preweeks = preweeks
 					})
 				}
+
+				this.$nextTick(function() {
+					console.log(date)
+					if (date >= new Date('2019-10-01 0:00'))
+						this.getCurrentMonthSelected(1)
+					else
+						this.getCurrentMonthSelected(0)
+					this.cale.selected = this.selected
+				})
 			},
 			swiperChange(e) {
 				let index = e.target.current;
