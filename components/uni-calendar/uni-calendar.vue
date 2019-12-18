@@ -64,6 +64,10 @@
 	import Calendar from './util.js';
 	import uniCalendarItem from './uni-calendar-item.vue';
 	import wPicker from "@/components/w-picker/w-picker.vue";
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
 	export default {
 		components: {
 			uniCalendarItem,
@@ -80,12 +84,12 @@
 			/**
 			 * 打点日期
 			 */
-			selected: {
-				type: Array,
-				default () {
-					return []
-				}
-			},
+			// selected: {
+			// 	type: Array,
+			// 	default () {
+			// 		return []
+			// 	}
+			// },
 			/**
 			 * 是否开启阴历日期
 			 */
@@ -137,6 +141,9 @@
 				nowDate: '',
 				aniMaskShow: false
 			}
+		},
+		computed: {
+			...mapState(['selected'])
 		},
 		watch: {
 			selected(newVal) {
