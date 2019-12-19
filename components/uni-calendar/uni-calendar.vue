@@ -28,7 +28,7 @@
 				<!-- <view class="uni-calendar__box-bg">
 					<text class="uni-calendar__box-bg-text">{{nowDate.month}}</text>
 				</view> -->
-				<swiper class="uni-swipper" :duration="800" :circular="true" :current="currentIndex" @change="swiperChange">
+				<swiper class="uni-swipper" :duration="100" :circular="true" :current="currentIndex" @change="swiperChange">
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in preweeks" :key="weekIndex">
 							<view class="uni-calendar__weeks-item" v-for="(preweeks,preweeksIndex) in item" :key="preweeksIndex">
@@ -230,15 +230,15 @@
 				// console.log(weeks)
 				if (weeks.disable) return
 
-				this.$nextTick(function() {
-					if (this.currentIndex == 0)
-						this.nowDate = this.precalendar = weeks
-					if (this.currentIndex == 1)
-						this.nowDate = this.calendar = weeks
-					if (this.currentIndex == 2)
-						this.nowDate = this.nextcalendar = weeks
-					this.change(weeks)
-				});
+				// this.$nextTick(function() {
+				if (this.currentIndex == 0)
+					this.precalendar = weeks
+				if (this.currentIndex == 1)
+					this.calendar = weeks
+				if (this.currentIndex == 2)
+					this.nextcalendar = weeks
+				this.change(weeks)
+				// });
 			},
 			backtoday() {
 				this.setDate(new Date())
@@ -274,35 +274,36 @@
 				this.cale.setDate(date)
 
 				if (this.currentIndex == 1) {
-					preweeks = this.cale.preweeks
-					nextweeks = this.cale.nextweeks
 					weeks = this.cale.weeks
 					this.nowDate = this.calendar = this.cale.getInfo(date)
 					this.weeks = weeks
 					this.$nextTick(function() {
 						this.change(this.calendar)
+						preweeks = this.cale.preweeks
+						nextweeks = this.cale.nextweeks
 						this.preweeks = preweeks
 						this.nextweeks = nextweeks
 					})
 				} else if (this.currentIndex == 0) {
 					preweeks = this.cale.weeks
-					nextweeks = this.cale.preweeks
-					weeks = this.cale.nextweeks
+
 					this.nowDate = this.precalendar = this.cale.getInfo(date)
 					this.preweeks = preweeks
 					this.$nextTick(function() {
 						this.change(this.precalendar)
+						nextweeks = this.cale.preweeks
+						weeks = this.cale.nextweeks
 						this.weeks = weeks
 						this.nextweeks = nextweeks
 					})
 				} else if (this.currentIndex == 2) {
-					preweeks = this.cale.nextweeks
 					nextweeks = this.cale.weeks
-					weeks = this.cale.preweeks
 					this.nowDate = this.nextcalendar = this.cale.getInfo(date)
 					this.nextweeks = nextweeks
 					this.$nextTick(function() {
 						this.change(this.nextcalendar)
+						weeks = this.cale.preweeks
+						preweeks = this.cale.nextweeks
 						this.weeks = weeks
 						this.preweeks = preweeks
 					})
