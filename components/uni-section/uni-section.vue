@@ -12,6 +12,7 @@
 </template>
 
 <script>
+	// import "@/components/animate.css"
 	export default {
 		name: 'UniTitle',
 		props: {

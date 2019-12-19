@@ -3,7 +3,7 @@
 		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected" />
 		<view class="content">
 			<view v-for="(item, index) in itemArr" :key="index">
-			<uni-section  v-if="showSection" :title="item.info" :subTitle="item.days" type="line"></uni-section>
+				<uni-section v-if="showSection" :title="item.info" :subTitle="item.days" type="line"></uni-section>
 			</view>
 		</view>
 	</view>
@@ -17,7 +17,7 @@
 		mapMutations,
 		mapActions
 	} from 'vuex'
-	
+
 	export default {
 		components: {
 			uniCalendar,
@@ -26,7 +26,7 @@
 		data() {
 			return {
 				itemArr: '',
-				showSection:false,
+				showSection: false,
 				content: 'aaaaaaaaaaaa',
 				type: 'bottom',
 				showCalendar: false
@@ -37,13 +37,13 @@
 		},
 		onReady() {
 			this.$nextTick(() => {
-				this.showCalendar = true			
+				this.showCalendar = true
 				this.getCurrentMonthSelected(1)
 				console.log("$nextTick");
 			})
 		},
 		methods: {
-			 ...mapActions(['getCurrentMonthSelected']),
+			...mapActions(['getCurrentMonthSelected']),
 			change(e) {
 				this.showSection = false
 				if (e.extraInfo != undefined) {
