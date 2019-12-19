@@ -143,7 +143,7 @@
 		opacity: 0.8;
 		color: #fff;
 		border-radius: 50% 0 50% 0;
-		// transition: all 0.1s ease 0.05s;
+		transition: all 0.1s ease 0.05s;
 	}
 
 	.uni-calendar-item--isDay:hover {
@@ -160,7 +160,7 @@
 		color: #fff;
 		opacity: 0.8;
 		border-radius: 50% 0 50% 0;
-		// transition: all 0.1s ease 0.05s;
+		transition: all 0.1s ease 0.05s;
 	}
 
 	.uni-calendar-item--checked:hover {

@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "uni-calendar-item": "/components/uni-calendar/uni-calendar-item",
+    "w-picker": "/components/w-picker/w-picker"
+  },
+  "component": true
+}

@@ -1,0 +1,34 @@
+{
+  "pages": [
+    "pages/tabBar/calendar/calendar",
+    "pages/tabBar/dayMark/dayMark"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "Anniversary",
+    "navigationBarBackgroundColor": "#24CACA",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#007AFF",
+    "borderStyle": "black",
+    "backgroundColor": "#F8F8F8",
+    "list": [
+      {
+        "pagePath": "pages/tabBar/calendar/calendar",
+        "iconPath": "static/component.png",
+        "selectedIconPath": "static/componentHL.png",
+        "text": "Calendar"
+      },
+      {
+        "pagePath": "pages/tabBar/dayMark/dayMark",
+        "iconPath": "static/component.png",
+        "selectedIconPath": "static/componentHL.png",
+        "text": "DayMark"
+      }
+    ]
+  },
+  "usingComponents": {}
+}
