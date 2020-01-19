@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "Anniversary",
-  "usingComponents": {
-    "uni-calendar": "/components/uni-calendar/uni-calendar",
-    "uni-section": "/components/uni-section/uni-section"
-  }
-}

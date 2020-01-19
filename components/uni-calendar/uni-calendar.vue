@@ -14,14 +14,16 @@
 				<view class="uni-calendar__header-btn-box" @click="pre">
 					<view class="uni-calendar__header-btn uni-calendar--left"></view>
 				</view>
-				<text class="uni-calendar__header-text" @click="showPicker">{{ (nowDate.year||'') +'年'+( nowDate.month||'') +'月'}}</text>
+				<picker mode="date" :value="nowDate.fullDate" @change="bindDateChange">
+					<view class="uni-input">{{ (nowDate.year||'') +'年'+( nowDate.month||'') +'月'}}</view>
+				</picker>
 				<view class="uni-calendar__header-btn-box" @click="next">
 					<view class="uni-calendar__header-btn uni-calendar--right"></view>
 				</view>
 				<text class="uni-calendar__backtoday" @click="backtoday">回到今天</text>
 			</view>
 			<view class="uni-calendar__weeks">
-				<view class="uni-calendar__weeks-header" v-for="(week,wIndex) in weekHeader" :key="wIndex">{{week}}</view>
+				<view class="uni-calendar__weeks-header" v-for="(week,wIndex) in weekHeader" :key="wIndex"><text class="uni-calendar__weeks-header">{{week}}</text></view>
 			</view>
 
 			<view class="uni-calendar__box">
@@ -54,25 +56,40 @@
 					</swiper-item>
 				</swiper>
 			</view>
-
 		</view>
-		<w-picker mode="yearMonth" endYear="2100" :current="true" @confirm="onConfirm" ref="yearMonth" themeColor="#24CACA"></w-picker>
 	</view>
 </template>
 
 <script>
 	import Calendar from './util.js';
 	import uniCalendarItem from './uni-calendar-item.vue';
-	import wPicker from "@/components/w-picker/w-picker.vue";
 	import {
 		mapState,
 		mapMutations,
 		mapActions
 	} from 'vuex'
+
+	function getDate(type) {
+		const date = new Date();
+
+		let year = date.getFullYear();
+		let month = date.getMonth() + 1;
+		let day = date.getDate();
+
+		if (type === 'start') {
+			year = year - 60;
+		} else if (type === 'end') {
+			year = year + 2;
+		}
+		month = month > 9 ? month : '0' + month;;
+		day = day > 9 ? day : '0' + day;
+
+		return `${year}-${month}-${day}`;
+	}
+
 	export default {
 		components: {
 			uniCalendarItem,
-			wPicker
 		},
 		props: {
 			/**
@@ -82,15 +99,6 @@
 				type: String,
 				default: ''
 			},
-			/**
-			 * 打点日期
-			 */
-			// selected: {
-			// 	type: Array,
-			// 	default () {
-			// 		return []
-			// 	}
-			// },
 			/**
 			 * 是否开启阴历日期
 			 */
@@ -140,7 +148,9 @@
 				calendar: {},
 				nextcalendar: {},
 				nowDate: '',
-				aniMaskShow: false
+				aniMaskShow: false,
+				pickerstartDate: getDate('start'),
+				pickerendDate: getDate('end'),
 			}
 		},
 		computed: {
@@ -148,7 +158,7 @@
 		},
 		watch: {
 			// selected(newVal) {
-			// 	console.log("selected");
+			// 	//console.log("selected");
 			// 	// this.nowDate = this.calendar = this.cale.getInfo(newVal.date)
 			// 	// this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
 			// 	// this.preweeks = this.cale.preweeks
@@ -207,7 +217,7 @@
 				this.setEmit('change', weeks)
 			},
 			setEmit(name, weeks) {
-				console.log(weeks)
+				//console.log(weeks)
 				let {
 					year,
 					month,
@@ -227,7 +237,7 @@
 				})
 			},
 			choiceDate(weeks) {
-				// console.log(weeks)
+				// //console.log(weeks)
 				if (weeks.disable) return
 
 				// this.$nextTick(function() {
@@ -310,7 +320,7 @@
 				}
 
 				this.$nextTick(function() {
-					console.log(date)
+					//console.log(date)
 					if (date >= new Date('2019-10-01 0:00'))
 						this.getCurrentMonthSelected(1)
 					else
@@ -319,9 +329,9 @@
 				})
 			},
 			swiperChange(e) {
-				let index = e.target.current;
-				// console.log(e);
-
+				let index = e.detail.current;
+				// //console.log(e);
+				
 				let isPrev = (index - this.lastIndex == -1 || index - this.lastIndex == 2) ? true : false;
 				this.currentIndex = index;
 				if (isPrev) {
@@ -331,12 +341,9 @@
 				}
 				this.lastIndex = index;
 			},
-			onConfirm(val) {
-				const selectDate = new Date(val.checkArr[0] + '-' + val.checkArr[1] + '-01');
-				this.setDate(selectDate)
-			},
-			showPicker() {
-				this.$refs["yearMonth"].show();
+			bindDateChange: function(e) {
+				console.log(e);
+				this.setDate(e.detail.value)
 			},
 		}
 
@@ -489,9 +496,12 @@
 		justify-content: center;
 		align-items: center;
 		font-size: $uni-font-size-base;
-		color: $uni-color-primary;
 		margin-bottom: 5px;
 		margin-top: 5px;
+	}
+
+	.uni-calendar__weeks-header {
+		color: $uni-color-primary;
 	}
 
 	.uni-calendar__weeks-item {

@@ -2,8 +2,8 @@
 	<view v-if="showCalendar">
 		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected" />
 		<view class="content">
-			<view v-for="(item, index) in itemArr" :key="index">
-				<uni-section v-if="showSection" :title="item.info" :subTitle="item.days" type="line"></uni-section>
+			<view class="uni-navigate-item" v-for="(item, index) in itemArr" :key="index">
+				<uni-section class="uni-navigate-text" v-if="showSection" :title="item.info" :subTitle="item.days" type="line"></uni-section>
 			</view>
 		</view>
 	</view>
@@ -49,7 +49,6 @@
 				if (e.extraInfo != undefined) {
 					this.showSection = true
 					this.itemArr = e.extraInfo
-					console.log(e)
 				}
 			},
 
@@ -59,11 +58,6 @@
 
 <style>
 	.content {
-		min-height: 100%;
-		height: auto;
-		margin: 0 auto -50px;
-		padding: 0 0 50px;
-		width: 100%;
 		margin-top: 50px;
 	}
 </style>

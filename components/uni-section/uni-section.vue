@@ -12,7 +12,6 @@
 </template>
 
 <script>
-	// import "@/components/animate.css"
 	export default {
 		name: 'UniTitle',
 		props: {
@@ -58,7 +57,6 @@
 		align-items: center;
 		padding: 0 10px;
 		height: 50px;
-		background-color: #c0c0c00d;
 		border-bottom-color: #e5e5e5;
 		border-bottom-style: solid;
 		/* border-bottom-width: 1px; */
@@ -73,8 +71,7 @@
 	}
 
 	.uni-section:active {
-		background-color: #24caca54;
-
+		background-color: #ecf6f6;
 	}
 
 	.line {
@@ -112,9 +109,5 @@
 	.uni-section__content-sub {
 		font-size: 24rpx;
 		color: #999;
-	}
-
-	.uni-section__content-sub:active {
-		color: #fff;
 	}
 </style>

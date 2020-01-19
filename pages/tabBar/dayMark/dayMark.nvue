@@ -1,12 +1,3 @@
 <template>
-<view></view>
+<view>a</view>
 </template>
-
-<script>
-
-		
-	</script>
-	
-	<style>
-		
-	</style>

@@ -10,7 +10,7 @@ const store = new Vuex.Store({
 	mutations: {
 		setCurrentMonthSelected(state, selected) {
 			state.selected = selected;
-			console.log(state.selected);
+			//console.log(state.selected);
 		},
 		login(state, provider) {
 			state.hasLogin = true;
@@ -48,13 +48,13 @@ const store = new Vuex.Store({
 				// 			commit("login")
 				// 			setTimeout(function() { //模拟异步请求服务器获取 openid
 				// 				const openid = "123456789"
-				// 				console.log("uni.request mock openid[" + openid + "]");
+				// 				//console.log("uni.request mock openid[" + openid + "]");
 				// 				commit("setOpenid", openid)
 				// 				resolve(openid)
 				// 			}, 1000)
 				// 		},
 				// 		fail: (err) => {
-				// 			console.log("uni.login 接口调用失败，将无法正常使用开放接口等服务", err)
+				// 			//console.log("uni.login 接口调用失败，将无法正常使用开放接口等服务", err)
 				// 			reject(err)
 				// 		}
 				// 	})
@@ -64,7 +64,7 @@ const store = new Vuex.Store({
 				
 				
 				// let selected = []
-				// console.log(date + ":date")
+				// //console.log(date + ":date")
 				// if (date === 1) {
 				// 	selected = [
 				// 		{
@@ -119,12 +119,12 @@ const store = new Vuex.Store({
 				uni.request({
 					url: 'http://www.mocky.io/v2/5e1d8185360000521dc740e8',
 				}).then(res => {
-					console.log('request success', JSON.stringify(res[1].data));
+					//console.log('request success', JSON.stringify(res[1].data));
 					const selected = res[1].data
 					commit("setCurrentMonthSelected", selected)
 					resolve(selected)
 				}).catch(err => {
-					console.log('request fail', err);
+					//console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
 						showCancel: false

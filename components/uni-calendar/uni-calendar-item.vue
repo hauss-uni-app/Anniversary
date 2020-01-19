@@ -67,17 +67,14 @@
 		},
 		watch: {
 			calendar() {
-				console.log('calendar')
 				this.isChecked = false
 				if (this.calendar.fullDate === this.weeks.fullDate && !this.weeks.isDay)
 					this.isChecked = true
 			}
-			
+
 		},
 		methods: {
 			choiceDate(weeks) {
-				// console.log(weeks)
-				
 				this.$emit('change', weeks)
 			}
 		}
@@ -125,7 +122,6 @@
 		height: 8px;
 		border-radius: 8px;
 		background-color: $uni-color-error;
-
 	}
 
 	.uni-calendar-item--disable {
@@ -142,12 +138,14 @@
 		background-color: $uni-color-primary;
 		opacity: 0.8;
 		color: #fff;
-		border-radius: 50% 0 50% 0;
+		/* #ifndef APP-PLUS-NVUE */
 		transition: all 0.1s ease 0.05s;
+		/* #endif */
 	}
 
 	.uni-calendar-item--isDay:hover {
-		border-radius: 50% 0 50% 0;
+		border-top-left-radius: 25px;
+		border-bottom-right-radius: 25px;
 	}
 
 	.uni-calendar-item--extra {
@@ -159,12 +157,14 @@
 		background-color: $uni-color-primary;
 		color: #fff;
 		opacity: 0.8;
-		border-radius: 50% 0 50% 0;
+		/* #ifndef APP-PLUS-NVUE */
 		transition: all 0.1s ease 0.05s;
+		/* #endif */
 	}
 
 	.uni-calendar-item--checked:hover {
-		border-radius: 50% 0 50% 0;
+		border-top-left-radius: 25px;
+		border-bottom-right-radius: 25px;
 	}
 
 	.uni-calendar-item--multiple {
