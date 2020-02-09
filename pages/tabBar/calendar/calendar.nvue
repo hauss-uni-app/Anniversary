@@ -49,6 +49,7 @@
 				if (e.extraInfo != undefined) {
 					this.showSection = true
 					this.itemArr = e.extraInfo
+					console.log(e.extraInfo)
 				}
 			},
 

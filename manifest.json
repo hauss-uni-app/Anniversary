@@ -1,5 +1,5 @@
 {
-    "name" : "Anniversary",
+    "name" : "狗狗记日",
     "appid" : "__UNI__A9BCD39",
     "description" : "",
     "versionName" : "1.0.0",
@@ -56,11 +56,12 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx7b97d7f4bbfe5e54",
+        "appid" : "wx823171555c129d8e",
         "setting" : {
             "urlCheck" : false
         },
-        "usingComponents" : true
+        "usingComponents" : true,
+        "permission" : {}
     },
     "mp-alipay" : {
         "usingComponents" : true

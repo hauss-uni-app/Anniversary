@@ -1,0 +1,198 @@
+<template>
+	<view>
+		<view class="user-info" @click="toLogin">
+			<image s class="userinfo-avatar" :src="userInfo.avatarUrl"></image>
+			<view class="uni-h4 uni-center uni-common-mt userinfo-tittle-contain">
+				<text class="userinfo-tittle-text">Hi~ {{userInfo.nickName}}</text>
+			</view>
+		</view>
+		<button @tap="clearStorage">清理数据</button>
+	</view>
+
+</template>
+
+<script>
+	import uniList from '@/components/uni-list/uni-list.vue'
+	import uniListItem from '@/components/uni-list-item/uni-list-item.vue'
+	import helper from '@/common/helper.js';
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	export default {
+		components: {
+			uniList,
+			uniListItem
+		},
+		data() {
+			return {
+				extraIcon1: {
+					color: '#007aff',
+					size: '22',
+					type: 'weixin'
+				},
+				providerList: [],
+
+			}
+		},
+		computed: {
+			...mapState({
+				loginProvider: state => state.loginProvider,
+				hasLogin: state => state.hasLogin,
+				userInfo: state => state.userInfo
+			})
+		},
+
+		methods: {
+			...mapMutations(['login', 'setUserInfo','getUserInfo','clearUserInfo']),
+			toLogin() {
+				uni.getStorage({
+					key: 'hasLogin',
+					success: (res) => {
+						if (!res.data) {
+							this.getProvider();
+						} else {
+							console.log('userInfo ');
+							uni.getStorage({
+								key: 'userInfo',
+								success: (res) => {
+									console.log('userInfo success:', res.data);
+									this.setUserInfo(res.data);
+								},
+								fail: () => {
+									console.log('userInfo fail:');
+								}
+							})
+						}
+					},
+					fail: () => {
+						this.getProvider();
+					}
+				})
+			},
+			getProvider() {
+				uni.getProvider({
+					service: 'oauth',
+					success: (res) => {
+						// console.log(res.provider)
+						if (~res.provider.indexOf('weixin')) {
+							uni.login({
+								provider: 'weixin',
+								scopes: 'auth_user', //支付宝小程序需设置授权类型
+								success: (loginRes) => {
+									this.login('weixin');
+									console.log('login success:', loginRes);
+									this.getInfo();
+								},
+								fail: (err) => {
+									console.log('login fail:', err);
+								}
+							});
+						}
+					},
+					fail: (error) => {
+						console.log('获取登录通道失败', error);
+					}
+				});
+			},
+			// 获取用户信息 API 在小程序可直接使用，在 5+App 里面需要先登录才能调用
+			getInfo() {
+				uni.getUserInfo({
+					provider: this.loginProvider,
+					success: (result) => {
+						console.log('getUserInfo success', result);
+						this.setUserInfo(result.userInfo);
+					},
+					fail: (error) => {
+						console.log('getUserInfo fail', error);
+						let content = error.errMsg;
+						if (~content.indexOf('uni.login')) {
+							content = '请在登录页面完成登录操作';
+						}
+						// #ifndef APP-PLUS
+						uni.getSetting({
+							success: (res) => {
+								let authStatus = res.authSetting['scope.userInfo'];
+								if (!authStatus) {
+									uni.showModal({
+										title: '授权失败',
+										content: 'Hello uni-app需要获取您的用户信息，请在设置界面打开相关权限',
+										success: (res) => {
+											if (res.confirm) {
+												uni.openSetting()
+											}
+										}
+									})
+								} else {
+									uni.showModal({
+										title: '获取用户信息失败',
+										content: '错误原因' + content,
+										showCancel: false
+									});
+								}
+							}
+						})
+						// #endif
+						// #ifdef APP-PLUS
+						uni.showModal({
+							title: '获取用户信息失败',
+							content: '错误原因' + content,
+							showCancel: false
+						});
+						// #endif
+						// #ifdef MP-WEIXIN || MP-BAIDU || MP-QQ
+						if (error.detail.errMsg !== 'getUserInfo:ok') {
+							uni.showModal({
+								title: '获取用户信息失败',
+								content: '错误原因' + result.detail.errMsg,
+								showCancel: false
+							});
+						}
+						// #endif
+					}
+				});
+			},
+			clear() {
+				this.userInfo = {};
+			},
+			clearStorage() {
+				uni.clearStorageSync()
+				this.clear()
+				this.clearUserInfo()
+				uni.showModal({
+					title: '清除数据成功',
+					content: ' ',
+					showCancel: false
+				})
+			}
+		},
+		onLoad() {
+			console.log('onload');
+			this.getUserInfo();
+		},
+	}
+</script>
+
+<style lang="scss" scoped>
+	.user-info {
+		flex-direction: row;
+		padding: 10px;
+		background-color: $uni-color-primary;
+	}
+
+	.userinfo-avatar {
+		border-radius: 128upx;
+		width: 128upx;
+		height: 128upx;
+		padding: 10px;
+	}
+
+	.userinfo-tittle-contain {
+		justify-content: center;
+		padding-left: 10px;
+	}
+
+	.userinfo-tittle-text {
+		color: white;
+	}
+</style>

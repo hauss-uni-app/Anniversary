@@ -1,3 +1,28 @@
 <template>
-<view>a</view>
+<view>
+	<uni-list>
+		<uni-list-item v-for="item in selected" :key="item.id" :show-arrow="false" :title="item.info" :note="item.detail[0].date" />
+	</uni-list>
+	
+</view>
 </template>
+
+<script>
+	import uniList from '@/components/uni-list/uni-list.vue'
+	import uniListItem from '@/components/uni-list-item/uni-list-item.vue'
+	import {
+		mapState,
+		mapMutations,
+		mapActions
+	} from 'vuex'
+	export default {
+		components: {
+			uniList,
+			uniListItem
+		},
+		computed: {
+			...mapState(['selected'])
+		},
+	}
+	
+</script>

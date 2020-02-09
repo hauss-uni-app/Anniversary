@@ -11,15 +11,19 @@
 				</view>
 			</view>
 			<view class="uni-calendar__header">
-				<view class="uni-calendar__header-btn-box" @click="pre">
+				<!-- <view class="uni-calendar__header-btn-box" @click="pre">
 					<view class="uni-calendar__header-btn uni-calendar--left"></view>
-				</view>
+				</view> -->
 				<picker mode="date" :value="nowDate.fullDate" @change="bindDateChange">
-					<view class="uni-input">{{ (nowDate.year||'') +'年'+( nowDate.month||'') +'月'}}</view>
+					<view class="uni-calendar__weeks">
+						<text class="uni-input">{{ (nowDate.year||'') +'年'+( nowDate.month||'') +'月 '}}</text>
+						<text class="uni-input_down">▼</text>
+					</view>
 				</picker>
-				<view class="uni-calendar__header-btn-box" @click="next">
+
+				<!-- <view class="uni-calendar__header-btn-box" @click="next">
 					<view class="uni-calendar__header-btn uni-calendar--right"></view>
-				</view>
+				</view> -->
 				<text class="uni-calendar__backtoday" @click="backtoday">回到今天</text>
 			</view>
 			<view class="uni-calendar__weeks">
@@ -331,7 +335,7 @@
 			swiperChange(e) {
 				let index = e.detail.current;
 				// //console.log(e);
-				
+
 				let isPrev = (index - this.lastIndex == -1 || index - this.lastIndex == 2) ? true : false;
 				this.currentIndex = index;
 				if (isPrev) {
@@ -410,6 +414,7 @@
 		border-bottom-color: $uni-border-color;
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
+		background-color: $uni-color-primary;
 	}
 
 	.uni-calendar--fixed-top {
@@ -476,10 +481,12 @@
 
 	.uni-calendar--left {
 		transform: rotate(-45deg);
+		border-color: white;
 	}
 
 	.uni-calendar--right {
 		transform: rotate(135deg);
+		border-color: white;
 	}
 
 
@@ -546,5 +553,17 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+	}
+
+	.uni-input {
+		font-weight: bold;
+		color: white;
+	}
+
+	.uni-input_down {
+		font-weight: bold;
+		color: white;
+		font-size: 10px;
+		margin-top: 5px;
 	}
 </style>

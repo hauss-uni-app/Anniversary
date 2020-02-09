@@ -104,10 +104,36 @@ class Calendar {
 			// 是否今天
 			let isDay = fullDate === nowDate
 			// 获取打点信息
-			let info = null
-			let setSelectInfo = this.selected.filter(item => this.dateEqual(nowDate, item.date) === true)
-			if (setSelectInfo.length > 0)
-				info = setSelectInfo
+			let infos = []
+			if (this.selected.length > 0) {
+				// debugger;
+				// console.log('selected success', this.selected);
+
+				this.selected.forEach((item_info) => {
+					// console.log('item_info', item_info);
+					item_info.detail.forEach((item_detail) => {
+						if (this.dateEqual(nowDate, item_detail.date)) {
+							let info = {
+								info: item_info.info,
+								days: item_detail.days
+							};
+							infos.push(info);
+						}
+					})
+				})
+				// console.log('info', infos);
+				// let setSelectInfos = this.selected.filter((item) => {
+				// 		if(item.detail.length >0){
+				// 			if(this.dateEqual(nowDate, item.detail.date))
+				// 		}
+				// })
+
+				// let setSelectInfos = this.selected.filter(item => this.dateEqual(nowDate, item.date) === true)
+				// if (setSelectInfos.length > 0)
+
+			}
+
+			// console.log('info success', info);
 			// 日期禁用
 			let disableBefore = true
 			let disableAfter = true
@@ -145,8 +171,8 @@ class Calendar {
 				disable: !disableBefore || !disableAfter,
 				isDay
 			}
-			if (info) {
-				data.extraInfo = info
+			if (infos.length > 0) {
+				data.extraInfo = infos
 			}
 
 			dateArr.push(data)

@@ -1,5 +1,6 @@
 <template>
-	<view :class="disabled ? 'uni-list-item--disabled' : ''" :hover-class="disabled || showSwitch ? '' : 'uni-list-item--hover'" class="uni-list-item" @click="onClick">
+	<view :class="disabled ? 'uni-list-item--disabled' : ''" :hover-class="disabled || showSwitch || disabledSwipe ? '' : 'uni-list-item--hover'" class="uni-list-item" @click="onClick">
+	<uni-swipe-action @click="bindClick" :options="options1" :disabled="disabledSwipe">
 		<view class="uni-list-item__container" :class="{'uni-list-item--first':isFirstChild}">
 			<view v-if="thumb" class="uni-list-item__icon">
 				<image :src="thumb" class="uni-list-item__icon-img" />
@@ -17,15 +18,18 @@
 				<uni-icons v-if="showArrow" :size="20" class="uni-icon-wrapper" color="#bbb" type="arrowright" />
 			</view>
 		</view>
+	</uni-swipe-action>
 	</view>
 </template>
 
 <script>
 	import uniIcons from '@/components/uni-icons/uni-icons.vue'
 	import uniBadge from '@/components/uni-badge/uni-badge.vue'
+	import uniSwipeAction from '@/components/uni-swipe-action/uni-swipe-action.vue'
 	export default {
 		name: 'UniListItem',
 		components: {
+			uniSwipeAction,
 			uniIcons,
 			uniBadge
 		},
@@ -63,6 +67,10 @@
 				type: [Boolean, String],
 				default: false
 			},
+			disabledSwipe: {
+				type: [Boolean, String],
+				default: false
+			},
 			badgeText: {
 				// badge内容
 				type: String,
@@ -97,7 +105,18 @@
 		inject: ['list'],
 		data() {
 			return {
-				isFirstChild: false
+				isFirstChild: false,
+				options1: [{
+					text: '修改',
+					style: {
+						backgroundColor: '#24CACA'
+					}
+				}, {
+					text: '删除',
+					style: {
+						backgroundColor: '#dd524d'
+					}
+				}],
 			}
 		},
 		mounted() {
@@ -112,7 +131,14 @@
 			},
 			onSwitchChange(e) {
 				this.$emit('switchChange', e.detail)
-			}
+			},
+			bindClick(e) {
+				console.log(e)
+				uni.showToast({
+					title: `点击了${e.content.text}按钮`,
+					icon: 'none'
+				})
+			},
 		}
 	}
 </script>
@@ -131,7 +157,8 @@
 	}
 
 	.uni-list-item--hover {
-		background-color: #f1f1f1;
+		background-color: #24CACA;
+		opacity: 0.3;
 	}
 
 	.uni-list-item__container {
