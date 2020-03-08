@@ -3,7 +3,7 @@
 		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected" />
 		<view class="content">
 			<view class="uni-navigate-item" v-for="(item, index) in itemArr" :key="index">
-				<uni-section class="uni-navigate-text" v-if="showSection" :title="item.info" :subTitle="item.days" type="line"></uni-section>
+				<uni-section class="uni-navigate-text" v-if="showSection" :title="item.info" :subTitle="item.days.toString()" type="line"></uni-section>
 			</view>
 		</view>
 	</view>
@@ -35,21 +35,25 @@
 		computed: {
 			...mapState(['selected'])
 		},
-		onReady() {
+		onLoad() {
 			this.$nextTick(() => {
-				this.showCalendar = true
-				this.getCurrentMonthSelected(1)
-				console.log("$nextTick");
+				this.getCurrentMonth(new Date().toLocaleDateString())
+				console.log("$nextTick11");
 			})
 		},
 		methods: {
 			...mapActions(['getCurrentMonthSelected']),
+			async getCurrentMonth(date){
+				await this.getCurrentMonthSelected()
+				this.showCalendar = true
+			},
 			change(e) {
+				console.log(e)
 				this.showSection = false
 				if (e.extraInfo != undefined) {
 					this.showSection = true
 					this.itemArr = e.extraInfo
-					console.log(e.extraInfo)
+					// console.log(e.extraInfo)
 				}
 			},
 

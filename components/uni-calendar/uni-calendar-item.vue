@@ -69,6 +69,7 @@
 		watch: {
 			calendar() {
 				this.isChecked = false
+				// console.log('calendar',this.weeks)
 				if (this.calendar.fullDate === this.weeks.fullDate && !this.weeks.isDay)
 					this.isChecked = true
 			}
@@ -76,6 +77,7 @@
 		},
 		methods: {
 			choiceDate(weeks) {
+				console.log(weeks)
 				this.$emit('change', weeks)
 			}
 		}
@@ -149,7 +151,7 @@
 	}
 
 	.uni-calendar-item--extra {
-		color: $uni-color-error;
+		// color: $uni-color-error;
 		opacity: 0.8;
 	}
 

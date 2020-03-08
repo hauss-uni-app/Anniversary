@@ -16,8 +16,8 @@
 				</view> -->
 				<picker mode="date" :value="nowDate.fullDate" @change="bindDateChange">
 					<view class="uni-calendar__weeks">
-						<text class="uni-input">{{ (nowDate.year||'') +'年'+( nowDate.month||'') +'月 '}}</text>
-						<text class="uni-input_down">▼</text>
+						<text class="uni-input-cal">{{ (nowDate.year||'') +'年'+( nowDate.month||'') +'月 '}}</text>
+						<text class="uni-input_down-cal">▼</text>
 					</view>
 				</picker>
 
@@ -179,9 +179,9 @@
 				endDate: this.endDate,
 				range: this.range,
 			})
-			this.init(this.cale.date.fullDate)
-
-
+			// console.log(this.cale.date.fullDate)
+			// this.init(this.cale.date.fullDate)
+			this.setDate(this.cale.date.fullDate)
 		},
 		methods: {
 			...mapActions(['getCurrentMonthSelected']),
@@ -255,7 +255,7 @@
 				// });
 			},
 			backtoday() {
-				this.setDate(new Date())
+				this.setDate(new Date().toLocaleDateString())
 			},
 			pre() {
 				const {
@@ -266,10 +266,11 @@
 					day
 				} = this.cale.getDate(this.nowDate.fullDate, -1, 'month')
 
-				const preDate = new Date(year, month - 1, 1)
+				const preDate = new Date(year, month - 1, 1).toLocaleDateString()
 				this.setDate(preDate)
 			},
 			next() {
+				// debugger
 				const {
 					fullDate,
 					year,
@@ -278,15 +279,19 @@
 					day
 				} = this.cale.getDate(this.nowDate.fullDate, +1, 'month')
 
-				const nextDate = new Date(year, month - 1, 1)
+				const nextDate = new Date(year, month - 1, 1).toLocaleDateString()
+
 				this.setDate(nextDate)
 			},
-			setDate(date) {
+			async setDate(date) {
 				var preweeks = []
 				var nextweeks = []
 				var weeks = []
-				this.cale.setDate(date)
 
+				// await this.getCurrentMonthSelected(date)
+				this.cale.setDate(date)
+				this.cale.selected = this.selected
+				console.log('currentindex', this.currentIndex)
 				if (this.currentIndex == 1) {
 					weeks = this.cale.weeks
 					this.nowDate = this.calendar = this.cale.getInfo(date)
@@ -322,15 +327,6 @@
 						this.preweeks = preweeks
 					})
 				}
-
-				this.$nextTick(function() {
-					//console.log(date)
-					if (date >= new Date('2019-10-01 0:00'))
-						this.getCurrentMonthSelected(1)
-					else
-						this.getCurrentMonthSelected(0)
-					this.cale.selected = this.selected
-				})
 			},
 			swiperChange(e) {
 				let index = e.detail.current;
@@ -346,7 +342,7 @@
 				this.lastIndex = index;
 			},
 			bindDateChange: function(e) {
-				console.log(e);
+				// console.log(e);
 				this.setDate(e.detail.value)
 			},
 		}
@@ -555,12 +551,13 @@
 		align-items: center;
 	}
 
-	.uni-input {
+	.uni-input-cal {
 		font-weight: bold;
 		color: white;
+		font-size: 18px;
 	}
 
-	.uni-input_down {
+	.uni-input_down-cal {
 		font-weight: bold;
 		color: white;
 		font-size: 10px;

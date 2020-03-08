@@ -5,10 +5,10 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
 	state: {
-		allData:[],
+		allData: [],
 		hasLogin: false,
 		loginProvider: "",
-		openid: null,
+		openid: "123456",
 		testvuex: false,
 		selected: [],
 		colorIndex: 0,
@@ -18,7 +18,7 @@ const store = new Vuex.Store({
 		}
 	},
 	mutations: {
-		setAllData(state,allData){
+		setAllData(state, allData) {
 			state.allData = allData;
 		},
 		setCurrentMonthSelected(state, selected) {
@@ -110,56 +110,68 @@ const store = new Vuex.Store({
 		},
 	},
 	actions: {
-		getAllData: async function({
-			commit,
-			state
-		}, date) {
-			return await new Promise((resolve, reject) => {
-				uni.request({
-					url: 'http://www.mocky.io/v2/5e33d79a3000008300d96084',
-					//url: 'http://www.mocky.io/v2/5e1d8185360000521dc740e8',
-					// url: 'http://www.mocky.io/v2/5e3500962f000068007933c5',
-				}).then(res => {
-					console.log('request success', JSON.stringify(res[1].data));
-					const allData = res[1].data
-					commit("setAllData", allData)
-					resolve(allData)
-				}).catch(err => {
-					//console.log('request fail', err);
-					uni.showModal({
-						content: err.errMsg,
-						showCancel: false
-					});
-					reject(err)
-				});
-			})
-		},
-
 		// lazy loading openid
 		getCurrentMonthSelected: async function({
 			commit,
 			state
 		}, date) {
 			return await new Promise((resolve, reject) => {
+				var para = {}
+				para.openId = state.openid
+				if (date != undefined) {
+					para.date = date
+				}
 				uni.request({
-					url: 'http://www.mocky.io/v2/5e33d79a3000008300d96084',
+					url: 'http://192.168.15.107:8012/api/User',
+					// url: 'http://www.mocky.io/v2/5e33d79a3000008300d96084',
 					//url: 'http://www.mocky.io/v2/5e1d8185360000521dc740e8',
-					//url: 'http://www.mocky.io/v2/5e3500962f000068007933c5',
+					// url: 'http://www.mocky.io/v2/5e3500962f000068007933c5',
+					// dataType: 'text',
+					data: para
 				}).then(res => {
-					console.log('request success', JSON.stringify(res[1].data));
-					const selected = res[1].data
+					// console.log(JSON.stringify(res));
+					const selected = res[1].data.response
+					console.log('request selected', selected)
 					commit("setCurrentMonthSelected", selected)
 					resolve(selected)
 				}).catch(err => {
-					//console.log('request fail', err);
+					console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
-						showCancel: false
+						// showCancel: false
 					});
 					reject(err)
 				});
 			})
-		}
+		},
+		addInfo: async function({
+			commit,
+			state
+		}, openId, name) {
+			return await new Promise((resolve, reject) => {
+				uni.request({
+					url: 'http://192.168.15.107:8012/api/Info',
+					data: {
+						'openId': openId,
+						'name': name
+					}
+				}).then(res => {
+					// console.log(JSON.stringify(res));
+					const selected = res[1].data.response
+					// console.log('request selected',selected)
+					commit("setCurrentMonthSelected", selected)
+					resolve(selected)
+				}).catch(err => {
+					console.log('request fail', err);
+					uni.showModal({
+						content: err.errMsg,
+						// showCancel: false
+					});
+					reject(err)
+				});
+			})
+		},
+
 	},
 })
 

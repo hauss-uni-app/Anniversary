@@ -107,30 +107,21 @@ class Calendar {
 			let infos = []
 			if (this.selected.length > 0) {
 				// debugger;
-				// console.log('selected success', this.selected);
+				 // console.log('selected success', this.selected);
 
 				this.selected.forEach((item_info) => {
 					// console.log('item_info', item_info);
-					item_info.detail.forEach((item_detail) => {
-						if (this.dateEqual(nowDate, item_detail.date)) {
+					item_info.infoDetail.forEach((item_detail) => {
+						if (this.dateEqual(nowDate, this.getDate(new Date(item_detail.date)).fullDate)) {
+							// debugger
 							let info = {
-								info: item_info.info,
+								info: item_info.info.name,
 								days: item_detail.days
 							};
 							infos.push(info);
 						}
 					})
 				})
-				// console.log('info', infos);
-				// let setSelectInfos = this.selected.filter((item) => {
-				// 		if(item.detail.length >0){
-				// 			if(this.dateEqual(nowDate, item.detail.date))
-				// 		}
-				// })
-
-				// let setSelectInfos = this.selected.filter(item => this.dateEqual(nowDate, item.date) === true)
-				// if (setSelectInfos.length > 0)
-
 			}
 
 			// console.log('info success', info);
@@ -199,12 +190,13 @@ class Calendar {
 	 * @param {Object} date
 	 */
 	setDate(date) {
+		// debugger
 		const preDate = this.getDate(date, -1, 'month').fullDate
 		this.preweeks = this._getWeek(preDate).weeks
 
 		const nextDate = this.getDate(date, +1, 'month').fullDate
 		this.nextweeks = this._getWeek(nextDate).weeks
-
+		console.log('setDate', this._getWeek(date).weeks)
 		this.weeks = this._getWeek(date).weeks
 	}
 	/**
@@ -212,6 +204,7 @@ class Calendar {
 	 * @param {Object} date
 	 */
 	getInfo(date) {
+		// debugger
 		if (!date) {
 			date = new Date()
 		}
@@ -288,7 +281,7 @@ class Calendar {
 
 		const nextDate = this.getDate(data, +1, 'month').fullDate
 		this.nextweeks = this._getWeek(nextDate).weeks
-
+		console.log('setSelectInfo', this._getWeek(data).weeks)
 		this.weeks = this._getWeek(data).weeks
 	}
 
@@ -311,7 +304,7 @@ class Calendar {
 
 			const nextDate = this.getDate(fullDate, +1, 'month').fullDate
 			this.nextweeks = this._getWeek(nextDate).weeks
-
+		console.log('weeks', this._getWeek(fullDate).weeks)
 			this.weeks = this._getWeek(fullDate).weeks
 		} else {
 			if (!before) {
@@ -328,7 +321,7 @@ class Calendar {
 
 				const nextDate = this.getDate(fullDate, +1, 'month').fullDate
 				this.nextweeks = this._getWeek(nextDate).weeks
-
+		console.log('weeks', this._getWeek(fullDate).weeks)
 				this.weeks = this._getWeek(fullDate).weeks
 			}
 		}
@@ -348,6 +341,7 @@ class Calendar {
 		} = this.getDate(dateData)
 		let firstDay = new Date(year, month - 1, 1).getDay()
 		let currentDay = new Date(year, month, 0).getDate()
+		// debugger
 		let dates = {
 			lastMonthDays: this._getLastMonthDays(firstDay, this.getDate(dateData)), // 上个月末尾几天
 			currentMonthDys: this._currentMonthDys(currentDay, this.getDate(dateData)), // 本月天数

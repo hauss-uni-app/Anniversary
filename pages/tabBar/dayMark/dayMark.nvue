@@ -1,15 +1,43 @@
 <template>
-<view>
-	<uni-list>
-		<uni-list-item v-for="item in selected" :key="item.id" :show-arrow="false" :title="item.info" :note="item.detail[0].date" />
-	</uni-list>
-	
-</view>
+	<view>
+
+		<uni-swipe-action v-for="item in selected" :key="item.info.infoId" :options="options1" @click="bindClick">
+			<uni-section class="uni-navigate-text" v-if="true" :title="item.info.name" :subTitle="getDate(item.infoDetail)" type="line"></uni-section>
+		</uni-swipe-action>
+
+		<uni-fab ref="fab" :pattern="pattern" :content="content" :horizontal="horizontal" :vertical="vertical" :direction="direction"
+		 @trigger="trigger" />
+
+		<uni-popup :show="showtip" :type="type" :mask-click="false" @change="change">
+			<view class="uni-tip">
+				<text class="uni-tip-title">添加记日</text>
+				<view class="uni-list-cell">
+					<input class="uni-input" focus placeholder="标题" />
+				</view>
+
+				<picker mode="date" :value="nowDate" @change="bindDateChange">
+					<view class="uni-list-cell">
+						<text class="uni-input">{{ nowDate }}</text>
+					</view>
+				</picker>
+
+				<view class="uni-tip-group-button">
+					<text class="uni-tip-button" @click="cancel('tip',false)">取消</text>
+					<text class="uni-tip-button" @click="cancel('tip',true)">确定</text>
+				</view>
+			</view>
+		</uni-popup>
+	</view>
 </template>
 
 <script>
 	import uniList from '@/components/uni-list/uni-list.vue'
 	import uniListItem from '@/components/uni-list-item/uni-list-item.vue'
+	import uniSwipeAction from '@/components/uni-swipe-action/uni-swipe-action.vue'
+	import uniSection from '@/components/uni-section/uni-section.vue'
+	import uniFab from '@/components/uni-fab/uni-fab.vue'
+	import uniPopup from '@/components/uni-popup/uni-popup.vue'
+	import helper from '@/common/helper.js';
 	import {
 		mapState,
 		mapMutations,
@@ -17,12 +45,183 @@
 	} from 'vuex'
 	export default {
 		components: {
+			uniSwipeAction,
 			uniList,
-			uniListItem
+			uniListItem,
+			uniSection,
+			uniFab,
+			uniPopup
 		},
 		computed: {
-			...mapState(['selected'])
+			...mapState(['selected', 'openid']),
+			...mapActions(['getCurrentMonthSelected']),
 		},
+		data() {
+			return {
+				options1: [{
+					text: '修改',
+					style: {
+						backgroundColor: '#24CACA'
+					}
+				}, {
+					text: '删除',
+					style: {
+						backgroundColor: '#dd524d'
+					}
+				}],
+				horizontal: 'left',
+				vertical: 'bottom',
+				direction: 'vertical',
+				pattern: {
+					color: '#7A7E83',
+					backgroundColor: '#fff',
+					selectedColor: '#7A7E83',
+					buttonColor: '#24CACA'
+				},
+				content: [{
+					iconPath: '/static/component.png',
+					selectedIconPath: '/static/component.png',
+					text: '记日',
+					active: false
+				}],
+				showtip: false,
+				type: '',
+				nowDate: '',
+			}
+		},
+		onLoad() {
+			console.log('selected1', this.selected)
+			// this.customLoad()
+			// console.log(helper.getDate());
+		},
+		methods: {
+			async customLoad() {
+				console.log('selected')
+				await this.getCurrentMonthSelected()
+				console.log('selected', this.selected)
+				console.log('openid', this.openid)
+				this.nowDate = helper.getDate().fullDate;
+			},
+			bindClick(e) {
+				// console.log(e)
+				uni.showToast({
+					title: `点击了${e.content.text}按钮`,
+					icon: 'none'
+				})
+			},
+			trigger(e) {
+				// console.log(e)
+				this.content[e.index].active = !e.item.active
+				this.togglePopup('center', 'tip')
+			},
+			change(e) {
+				// console.log('是否打开:' + e.show)
+				if (!e.show) {
+					// this.showpopup = false
+					this.showtip = false
+					// this.showimage = false
+					// this.showshare = false
+				}
+			},
+			togglePopup(type, open) {
+				// 	switch (type) {
+				// 		case 'top':
+				// 			this.content = '顶部弹出 popup'
+				// 			break
+
+				// 		case 'bottom':
+				// 			this.content = '底部弹出 popup'
+				// 			break
+				// 		case 'center':
+				// 			this.content = '居中弹出 popup'
+				// 			break
+				// 	}
+				this.type = type
+				this['show' + open] = true
+			},
+			cancel(type, isConfirm) {
+				this['show' + type] = false
+				if (isConfirm) {
+
+
+				}
+			},
+			bindDateChange(e) {
+				// console.log(e.detail.value);
+				this.nowDate = e.detail.value;
+				// this.setDate(e.detail.value)
+			},
+			getDate(date) {
+				if (date.length > 0) {
+					var lessDate = date.filter(f => f.days == 0);
+					if (lessDate.length > 0)
+						// console.log(helper.getDate(new Date(lessDate[0].date)).fullDate);
+						return helper.getDate(new Date(lessDate[0].date)).fullDate;
+				}
+			}
+		},
+		onLoad() {
+			this.platform = uni.getSystemInfoSync().platform
+		}
 	}
-	
 </script>
+<style>
+	/* 提示窗口 */
+	.uni-tip {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		flex-direction: column;
+		/* #endif */
+		padding: 15px;
+		width: 300px;
+		background-color: #fff;
+		border-radius: 10px;
+	}
+
+	.uni-tip-title {
+		text-align: center;
+		font-weight: bold;
+		font-size: 16px;
+		color: #333;
+	}
+
+	.uni-tip-content {
+		/* padding: 15px;
+ */
+		font-size: 14px;
+		color: #666;
+	}
+
+	.uni-tip-group-button {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		margin-top: 20px;
+	}
+
+	.uni-tip-button {
+		flex: 1;
+		text-align: center;
+		font-size: 14px;
+		color: #3b4144;
+	}
+
+	.uni-icon-clear {
+		color: #999;
+	}
+
+	.uni-input {
+		height: 40px;
+		font-size: 15px;
+	}
+
+	.with-fun {
+		/* -webkit-box-orient: horizontal; */
+		/* flex-direction: row; */
+	}
+
+	.title {
+		padding: 10upx 25upx;
+	}
+</style>>
