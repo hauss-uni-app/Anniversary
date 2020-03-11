@@ -1,7 +1,6 @@
 <template>
 	<view>
-
-		<uni-swipe-action v-for="item in selected" :key="item.info.infoId" :options="options1" @click="bindClick">
+		<uni-swipe-action v-for="(item,index) in selected" :key="index" :options="options1" :listIndex="index" @click="bindClick">
 			<uni-section class="uni-navigate-text" v-if="true" :title="item.info.name" :subTitle="getDate(item.infoDetail)" type="line"></uni-section>
 		</uni-swipe-action>
 
@@ -12,7 +11,7 @@
 			<view class="uni-tip">
 				<text class="uni-tip-title">添加记日</text>
 				<view class="uni-list-cell">
-					<input class="uni-input" focus placeholder="标题" />
+					<input class="uni-input" focus placeholder="标题" @input="onKeyInput" :value="tittle" />
 				</view>
 
 				<picker mode="date" :value="nowDate" @change="bindDateChange">
@@ -54,7 +53,6 @@
 		},
 		computed: {
 			...mapState(['selected', 'openid']),
-			...mapActions(['getCurrentMonthSelected']),
 		},
 		data() {
 			return {
@@ -87,27 +85,57 @@
 				showtip: false,
 				type: '',
 				nowDate: '',
+				tittle: '',
+				nowDateTemp: '',
+				tittleTemp: '',
+				isUpdate: false,
+				updateInfoId: '',
+				updateIndex: '',
 			}
 		},
-		onLoad() {
-			console.log('selected1', this.selected)
-			// this.customLoad()
+		onReady() {
+			// console.log('selected1', this.selected)
+			this.customLoad()
 			// console.log(helper.getDate());
 		},
 		methods: {
+			...mapActions(['getCurrentMonthSelected', 'addInfo', 'updateInfo']),
 			async customLoad() {
-				console.log('selected')
-				await this.getCurrentMonthSelected()
-				console.log('selected', this.selected)
-				console.log('openid', this.openid)
 				this.nowDate = helper.getDate().fullDate;
+				await this.getCurrentMonthSelected()
+				// console.log('selected', this.selected)
+				// console.log('openid', this.openid)
+				// console.log(helper.getDate().fullDate);
 			},
+
 			bindClick(e) {
-				// console.log(e)
-				uni.showToast({
-					title: `点击了${e.content.text}按钮`,
-					icon: 'none'
-				})
+				// console.log('e', e)
+				// uni.showToast({
+				// 	title: `点击了${e.content.text}按钮`,
+				// 	icon: 'none'
+				// })
+				switch (e.content.text) {
+					case '修改':
+						{
+							this.isUpdate = true
+							this.updateInfoId = this.selected[e.listIndex].info.infoId
+							this.nowDate = this.nowDateTemp = this.getDate(this.selected[e.listIndex].infoDetail)
+							this.tittle = this.tittleTemp = this.selected[e.listIndex].info.name
+							console.log('this.nowDateTemp', this.nowDateTemp)
+							console.log('this.tittleTemp', this.tittleTemp)
+							this.content[e.index].active = true
+							this.togglePopup('center', 'tip')
+							this.showtip = true
+							break;
+						}
+					case '删除':
+						{
+							break;
+						}
+					default:
+						break;
+				}
+
 			},
 			trigger(e) {
 				// console.log(e)
@@ -124,32 +152,47 @@
 				}
 			},
 			togglePopup(type, open) {
-				// 	switch (type) {
-				// 		case 'top':
-				// 			this.content = '顶部弹出 popup'
-				// 			break
-
-				// 		case 'bottom':
-				// 			this.content = '底部弹出 popup'
-				// 			break
-				// 		case 'center':
-				// 			this.content = '居中弹出 popup'
-				// 			break
-				// 	}
 				this.type = type
 				this['show' + open] = true
 			},
-			cancel(type, isConfirm) {
-				this['show' + type] = false
+			async cancel(type, isConfirm) {
 				if (isConfirm) {
+					console.log('isConfirm', this.nowDate)
 
 
+					if (this.isUpdate) {
+						if (this.nowDate != this.nowDateTemp || this.tittle != this.tittleTemp) {
+							var para = {
+								'infoId': this.updateInfoId,
+							}
+							if (this.nowDate != this.nowDateTemp)
+								para.date = this.nowDate
+							if (this.tittle != this.tittleTemp)
+								para.name = this.tittle
+							await this.updateInfo(para)
+						}
+					} else {
+						var para = {
+							'name': this.tittle,
+							'date': this.nowDate
+						}
+						await this.addInfo(para);
+					}
 				}
+				this['show' + type] = false
+				this.tittle = ''
+				this.tittleTemp = ''
+				this.nowDate = helper.getDate().fullDate;
+				this.nowDateTemp = ''
+				this.updateInfoId = ''
+			},
+			onKeyInput(e) {
+				console.log('onKeyInput', e.detail.value);
+				this.tittle = e.detail.value;
 			},
 			bindDateChange(e) {
-				// console.log(e.detail.value);
+				console.log('bindDateChange', e.detail.value);
 				this.nowDate = e.detail.value;
-				// this.setDate(e.detail.value)
 			},
 			getDate(date) {
 				if (date.length > 0) {

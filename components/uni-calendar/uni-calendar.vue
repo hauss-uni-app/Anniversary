@@ -161,14 +161,15 @@
 			...mapState(['selected'])
 		},
 		watch: {
-			// selected(newVal) {
-			// 	//console.log("selected");
-			// 	// this.nowDate = this.calendar = this.cale.getInfo(newVal.date)
-			// 	// this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
-			// 	// this.preweeks = this.cale.preweeks
-			// 	// this.nextweeks = this.cale.nextweeks
-			// 	// this.weeks = this.cale.weeks
-			// }
+			selected(newVal) {
+				console.log("watch selected");
+				this.setDate(this.nowDate.fullDate);
+				// this.nowDate = this.calendar = this.cale.getInfo(newVal.date)
+				// this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
+				// this.preweeks = this.cale.preweeks
+				// this.nextweeks = this.cale.nextweeks
+				// this.weeks = this.cale.weeks
+			}
 		},
 		created() {
 			// 获取日历方法实例

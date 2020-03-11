@@ -24,11 +24,11 @@ export default {
 	},
 	mounted() {
 		this.init()
-		setTimeout(()=>{
+		setTimeout(() => {
 			this.getSize()
 			this.getButtonSize()
-		},50)
-	
+		}, 50)
+
 	},
 	methods: {
 		init() {
@@ -50,10 +50,11 @@ export default {
 			this.$set(this.position, 0, valueObj)
 			// console.log('改变', e);
 		},
-		onClick(index, item) {
+		onClick(index, item, listIndex) {
 			this.$emit('click', {
 				content: item,
-				index
+				index,
+				listIndex
 			})
 		},
 		getSize() {

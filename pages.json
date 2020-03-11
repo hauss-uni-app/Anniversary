@@ -3,7 +3,8 @@
 		{
 			"path": "pages/tabBar/calendar/calendar"
 			// "style": {
-			// 	"navigationBarTitleText": "日历"
+			// 	// "navigationBarTitleText": "日历"
+			// 	"enablePullDownRefresh": true
 			// }
 		},
 		{

@@ -15,7 +15,8 @@ const store = new Vuex.Store({
 		userInfo: {
 			nickName: "您未登录",
 			avatarUrl: "/static/calender_press.png"
-		}
+		},
+		version: 0
 	},
 	mutations: {
 		setAllData(state, allData) {
@@ -23,6 +24,12 @@ const store = new Vuex.Store({
 		},
 		setCurrentMonthSelected(state, selected) {
 			state.selected = selected;
+			console.log('state.selected aaa', selected)
+			if (selected.length > 0) {
+				if (selected[0].user > 0) {
+					state.version = selected[0].user[0].version
+				}
+			}
 			//console.log(state.selected);
 		},
 		login(state, provider) {
@@ -123,13 +130,8 @@ const store = new Vuex.Store({
 				}
 				uni.request({
 					url: 'http://192.168.15.107:8012/api/User',
-					// url: 'http://www.mocky.io/v2/5e33d79a3000008300d96084',
-					//url: 'http://www.mocky.io/v2/5e1d8185360000521dc740e8',
-					// url: 'http://www.mocky.io/v2/5e3500962f000068007933c5',
-					// dataType: 'text',
 					data: para
 				}).then(res => {
-					// console.log(JSON.stringify(res));
 					const selected = res[1].data.response
 					console.log('request selected', selected)
 					commit("setCurrentMonthSelected", selected)
@@ -138,29 +140,74 @@ const store = new Vuex.Store({
 					console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
-						// showCancel: false
 					});
 					reject(err)
 				});
 			})
 		},
+
 		addInfo: async function({
 			commit,
 			state
-		}, openId, name) {
+		}, para) {
 			return await new Promise((resolve, reject) => {
+				var requestUrl = 'https://localhost:44320/api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
+					new Date(para.date).toLocaleDateString();
 				uni.request({
-					url: 'http://192.168.15.107:8012/api/Info',
-					data: {
-						'openId': openId,
-						'name': name
+					// url: 'http://192.168.15.107:8012/api/Info',
+					url: requestUrl,
+					method: 'POST',
+					header: {
+						'content-type': 'application/x-www-form-urlencoded',
 					}
 				}).then(res => {
-					// console.log(JSON.stringify(res));
-					const selected = res[1].data.response
-					// console.log('request selected',selected)
-					commit("setCurrentMonthSelected", selected)
-					resolve(selected)
+					if (res != undefined) {
+						if (res[1].data != undefined) {
+							if (res[1].data.response != undefined) {
+								const selected = res[1].data.response
+								commit("setCurrentMonthSelected", selected)
+								resolve(selected)
+							}
+						}
+					}
+					resolve(null)
+				}).catch(err => {
+					console.log('request fail', err);
+					uni.showModal({
+						content: err.errMsg,
+					});
+					reject(err)
+				});
+			})
+		},
+
+		updateInfo: async function({
+			commit,
+			state
+		}, para) {
+			return await new Promise((resolve, reject) => {
+				var requestUrl = 'https://localhost:44320/api/Info/Update?openId=' + state.openid +
+					'&infoId=' + para.infoId +
+					(para.name != undefined ? '&name=' + para.name : '') +
+					(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '');
+
+				uni.request({
+					url: requestUrl,
+					method: 'PUT',
+					header: {
+						'content-type': 'application/x-www-form-urlencoded',
+					}
+				}).then(res => {
+					if (res != undefined) {
+						if (res[1].data != undefined) {
+							if (res[1].data.response != undefined) {
+								const selected = res[1].data.response
+								commit("setCurrentMonthSelected", selected)
+								resolve(selected)
+							}
+						}
+					}
+					resolve(null)
 				}).catch(err => {
 					console.log('request fail', err);
 					uni.showModal({

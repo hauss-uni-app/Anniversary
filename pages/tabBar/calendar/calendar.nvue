@@ -41,9 +41,15 @@
 				console.log("$nextTick11");
 			})
 		},
+		onShow(){
+			uni.startPullDownRefresh();
+			this.getCurrentMonth(new Date().toLocaleDateString())
+			uni.stopPullDownRefresh();
+		},
 		methods: {
 			...mapActions(['getCurrentMonthSelected']),
-			async getCurrentMonth(date){
+			async getCurrentMonth(date) {
+				console.log('aaaaaaa')
 				await this.getCurrentMonthSelected()
 				this.showCalendar = true
 			},
