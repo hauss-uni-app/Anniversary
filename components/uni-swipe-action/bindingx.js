@@ -43,12 +43,17 @@ export default {
 		},
 	},
 	methods: {
-		onClick(index, item) {
+		onClick(index, item, listIndex) {
 			this.$emit('click', {
 				content: item,
-				index
+				index,
+				listIndex
 			})
 		},
+		itemClick(listIndex){
+			console.log("aaa",listIndex);
+			this.$emit('swipeclick', listIndex)
+		}
 		touchstart(e) {
 			if (this.isInAnimation) return
 			if (this.stop) return

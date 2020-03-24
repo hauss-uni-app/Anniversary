@@ -31,9 +31,9 @@ export default {
 		this.position = {}
 		this.init()
 
-		setTimeout(()=>{
+		setTimeout(() => {
 			this.getSelectorQuery()
-		},100)
+		}, 100)
 	},
 	beforeDestoy() {
 		uni.$off('__uni__swipe__event')
@@ -48,11 +48,16 @@ export default {
 				}
 			})
 		},
-		onClick(index, item) {
+		onClick(index, item, listIndex) {
 			this.$emit('click', {
 				content: item,
-				index
+				index,
+				listIndex
 			})
+		},
+		itemClick(listIndex){
+			console.log("aaa");
+			this.$emit('swipeclick', listIndex)
 		},
 		touchstart(e) {
 			const {

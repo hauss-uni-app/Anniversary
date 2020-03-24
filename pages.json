@@ -14,6 +14,12 @@
 			// }
 		},
 		{
+			"path": "pages/dayMarkDetail/dayMarkDetail",
+			"style": {
+				"navigationBarTitleText": "dayMarkDetailPage"
+			}
+		},
+		{
 			"path": "pages/tabBar/user/user"
 			// "style": {
 			// 	"navigationBarTitleText": "明细"

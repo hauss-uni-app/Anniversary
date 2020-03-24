@@ -3,7 +3,7 @@
 		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected" />
 		<view class="content">
 			<view class="uni-navigate-item" v-for="(item, index) in itemArr" :key="index">
-				<uni-section class="uni-navigate-text" v-if="showSection" :title="item.info" :subTitle="item.days.toString()" type="line"></uni-section>
+				<uni-section class="uni-navigate-text" v-if="showSection" :title="item.info" :subTitle="item.infoTitle" type="line"></uni-section>
 			</view>
 		</view>
 	</view>
@@ -33,24 +33,20 @@
 			}
 		},
 		computed: {
-			...mapState(['selected'])
-		},
-		onLoad() {
-			this.$nextTick(() => {
-				this.getCurrentMonth(new Date().toLocaleDateString())
-				console.log("$nextTick11");
-			})
-		},
-		onShow(){
-			uni.startPullDownRefresh();
-			this.getCurrentMonth(new Date().toLocaleDateString())
-			uni.stopPullDownRefresh();
+			...mapState(['selected', 'selectedDate'])
 		},
 		methods: {
 			...mapActions(['getCurrentMonthSelected']),
+			...mapMutations(['setSelectedDate']),
 			async getCurrentMonth(date) {
 				console.log('aaaaaaa')
-				await this.getCurrentMonthSelected()
+				if (this.selectedDate != '') {
+					console.log("onLoad-this.selectedDate", this.$refs);
+					this.$refs.calendar.setDate(this.selectedDate);
+					this.setSelectedDate('');
+				}else{
+					await this.getCurrentMonthSelected()
+				}
 				this.showCalendar = true
 			},
 			change(e) {
@@ -59,10 +55,21 @@
 				if (e.extraInfo != undefined) {
 					this.showSection = true
 					this.itemArr = e.extraInfo
-					// console.log(e.extraInfo)
+					console.log('hauss test', e.extraInfo)
 				}
 			},
 
+		},
+		onLoad() {
+			// this.$nextTick(() => {
+			// console.log("$nextTick11", this.selectedDate);
+			this.getCurrentMonth(new Date().toLocaleDateString());
+			// })
+		},
+		onShow() {
+			uni.startPullDownRefresh();
+			this.getCurrentMonth(new Date().toLocaleDateString())
+			uni.stopPullDownRefresh();
 		}
 	};
 </script>

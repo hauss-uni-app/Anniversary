@@ -16,7 +16,8 @@ const store = new Vuex.Store({
 			nickName: "您未登录",
 			avatarUrl: "/static/calender_press.png"
 		},
-		version: 0
+		version: 0,
+		selectedDate: ''
 	},
 	mutations: {
 		setAllData(state, allData) {
@@ -115,6 +116,9 @@ const store = new Vuex.Store({
 				}
 			})
 		},
+		setSelectedDate(state, date) {
+			state.selectedDate = date
+		}
 	},
 	actions: {
 		// lazy loading openid
@@ -129,8 +133,11 @@ const store = new Vuex.Store({
 					para.date = date
 				}
 				uni.request({
-					url: 'http://192.168.15.107:8012/api/User',
-					data: para
+					url: 'https://localhost:44320/api/User',
+					// url: 'http://192.168.15.107/api/User',
+					// url: 'http://120.25.215.190/api/User',
+					data: para,
+					sslVerify: false,
 				}).then(res => {
 					const selected = res[1].data.response
 					console.log('request selected', selected)
@@ -153,6 +160,14 @@ const store = new Vuex.Store({
 			return await new Promise((resolve, reject) => {
 				var requestUrl = 'https://localhost:44320/api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
 					new Date(para.date).toLocaleDateString();
+
+				// var requestUrl = 'http://192.168.15.107/api/Info?openId=' + state.openid + '&name=' + para.name +
+				// 	'&date=' +
+				// 	new Date(para.date).toLocaleDateString();
+
+				// var requestUrl = 'http://120.25.215.190/api/Info?openId=' + state.openid + '&name=' + para.name +
+				// 	'&date=' +
+				// 	new Date(para.date).toLocaleDateString();
 				uni.request({
 					// url: 'http://192.168.15.107:8012/api/Info',
 					url: requestUrl,
@@ -190,7 +205,14 @@ const store = new Vuex.Store({
 					'&infoId=' + para.infoId +
 					(para.name != undefined ? '&name=' + para.name : '') +
 					(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '');
-
+				// var requestUrl = 'http://192.168.15.107/api/Info?openId=' + state.openid +
+				// 	'&infoId=' + para.infoId +
+				// 	(para.name != undefined ? '&name=' + para.name : '') +
+				// 	(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '')
+				// var requestUrl = 'http://120.25.215.190/api/Info?openId=' + state.openid +
+				// 	'&infoId=' + para.infoId +
+				// 	(para.name != undefined ? '&name=' + para.name : '') +
+				// 	(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '')
 				uni.request({
 					url: requestUrl,
 					method: 'PUT',
@@ -199,11 +221,13 @@ const store = new Vuex.Store({
 					}
 				}).then(res => {
 					if (res != undefined) {
-						if (res[1].data != undefined) {
-							if (res[1].data.response != undefined) {
-								const selected = res[1].data.response
-								commit("setCurrentMonthSelected", selected)
-								resolve(selected)
+						if (res[1] != undefined) {
+							if (res[1].data != undefined) {
+								if (res[1].data.response != undefined) {
+									const selected = res[1].data.response
+									commit("setCurrentMonthSelected", selected)
+									resolve(selected)
+								}
 							}
 						}
 					}
@@ -219,6 +243,43 @@ const store = new Vuex.Store({
 			})
 		},
 
+		deleteInfo: async function({
+			commit,
+			state
+		}, para) {
+			return await new Promise((resolve, reject) => {
+				var requestUrl = 'https://localhost:44320/api/Info/?openId=' + state.openid +
+					'&infoId=' + para.infoId;
+
+				uni.request({
+					url: requestUrl,
+					method: 'DELETE',
+					header: {
+						'content-type': 'application/x-www-form-urlencoded',
+					}
+				}).then(res => {
+					if (res != undefined) {
+						if (res[1] != undefined) {
+							if (res[1].data != undefined) {
+								if (res[1].data.response != undefined) {
+									const selected = res[1].data.response
+									commit("setCurrentMonthSelected", selected)
+									resolve(selected)
+								}
+							}
+						}
+					}
+					resolve(null)
+				}).catch(err => {
+					console.log('request fail', err);
+					uni.showModal({
+						content: err.errMsg,
+						// showCancel: false
+					});
+					reject(err)
+				});
+			})
+		},
 	},
 })
 

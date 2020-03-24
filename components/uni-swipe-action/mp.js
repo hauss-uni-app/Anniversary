@@ -57,6 +57,10 @@ export default {
 				listIndex
 			})
 		},
+		itemClick(listIndex){
+			console.log("aaa",listIndex);
+			this.$emit('swipeclick', {listIndex})
+		},
 		getSize() {
 			const views = uni.createSelectorQuery().in(this)
 			views

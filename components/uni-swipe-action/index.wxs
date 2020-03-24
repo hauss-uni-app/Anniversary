@@ -161,9 +161,9 @@ function openState(type, ins, ownerInstance) {
 	state.isopen = type
 
 	// 通知页面,已经打开
-	ownerInstance.callMethod('change', {
-		open: type
-	})
+	// ownerInstance.callMethod('change', {
+	// 	open: type
+	// })
 	// 添加动画类
 	ins.addClass('ani');
 	var owner = ownerInstance.selectAllComponents('.button-hock')

@@ -1,7 +1,8 @@
 <template>
 	<view>
-		<uni-swipe-action v-for="(item,index) in selected" :key="index" :options="options1" :listIndex="index" @click="bindClick" @swipeclick="swipeclick">
-			<uni-section class="uni-navigate-text" v-if="true" :title="item.info.name" :subTitle="getDate(item.infoDetail)" type="line"></uni-section>
+		<uni-swipe-action v-for="(item,index) in selectedItem.infoDetail" :key="index" :options="options1" :listIndex="index"
+		 @click="bindClick" @swipeclick="swipeclick">
+			<uni-section class="uni-navigate-text" v-if="true" :title="item.infoTitle" :subTitle="getDate(item.date)" type="line"></uni-section>
 		</uni-swipe-action>
 
 		<uni-fab ref="fab" :pattern="pattern" :content="content" :horizontal="horizontal" :vertical="vertical" :direction="direction"
@@ -53,10 +54,11 @@
 			uniPopup
 		},
 		computed: {
-			...mapState(['selected', 'openid']),
+			...mapState(['openid']),
 		},
 		data() {
 			return {
+				selectedItem: {},
 				options1: [{
 					text: '修改',
 					style: {
@@ -93,24 +95,24 @@
 				tittleTemp: '',
 				isUpdate: false,
 				updateInfoId: '',
-				updateIndex: '',
+				updateIndex: ''
 			}
 		},
 		onReady() {
-			// console.log('selected1', this.selected)
 			this.customLoad()
-			// console.log(helper.getDate());
 		},
 		methods: {
-			...mapActions(['getCurrentMonthSelected', 'addInfo', 'updateInfo', 'deleteInfo']),
+			...mapActions(['getCurrentMonthSelected']),
+			...mapMutations(['setSelectedDate']),
 			async customLoad() {
 				this.nowDate = helper.getDate().fullDate;
 				await this.getCurrentMonthSelected()
 			},
 			swipeclick(e) {
-				// console.log(e)
-				uni.navigateTo({
-				    url: '/pages/dayMarkDetail/dayMarkDetail?item='+ encodeURIComponent(JSON.stringify(this.selected[e.listIndex]))
+				this.setSelectedDate(this.getDate(this.selectedItem.infoDetail[e.listIndex].date))
+				console.log('daymarkdetail', this.getDate(this.selectedItem.infoDetail[e.listIndex].date))
+				uni.switchTab({
+					url: '/pages/tabBar/calendar/calendar'
 				})
 			},
 			bindClick(e) {
@@ -123,8 +125,8 @@
 							this.updateInfoId = this.selected[e.listIndex].info.infoId
 							this.nowDate = this.nowDateTemp = this.getDate(this.selected[e.listIndex].infoDetail)
 							this.tittle = this.tittleTemp = this.selected[e.listIndex].info.name
-							// console.log('this.nowDateTemp', this.nowDateTemp)
-							// console.log('this.tittleTemp', this.tittleTemp)
+							console.log('this.nowDateTemp', this.nowDateTemp)
+							console.log('this.tittleTemp', this.tittleTemp)
 							this.content[e.index].active = true
 							this.togglePopup('center', 'tip')
 							this.showtip = true
@@ -144,12 +146,10 @@
 
 			},
 			trigger(e) {
-				// console.log(e)
 				this.content[e.index].active = !e.item.active
 				this.togglePopup('center', 'tip')
 			},
 			change(e) {
-				// console.log('是否打开:' + e.show)
 				if (!e.show) {
 					this.showtip = false
 				}
@@ -192,27 +192,25 @@
 				this.nowDate = helper.getDate().fullDate;
 				this.nowDateTemp = ''
 				this.updateInfoId = ''
-
 			},
 			onKeyInput(e) {
-				// console.log('onKeyInput', e.detail.value);
 				this.tittle = e.detail.value;
 			},
 			bindDateChange(e) {
-				// console.log('bindDateChange', e.detail.value);
 				this.nowDate = e.detail.value;
 			},
 			getDate(date) {
 				if (date.length > 0) {
-					var lessDate = date.filter(f => f.days == 0);
-					if (lessDate.length > 0)
-						// console.log(helper.getDate(new Date(lessDate[0].date)).fullDate);
-						return helper.getDate(new Date(lessDate[0].date)).fullDate;
+					return helper.getDate(new Date(date)).fullDate;
 				}
 			}
 		},
-		onLoad() {
-			this.platform = uni.getSystemInfoSync().platform
+		onLoad(option) {
+			this.selectedItem = JSON.parse(decodeURIComponent(option.item));
+			uni.setNavigationBarTitle({
+				title: this.selectedItem.info.name
+			})
+			console.log('this.selectedItem', this.selectedItem)
 		}
 	}
 </script>
@@ -273,6 +271,6 @@
 	}
 
 	.title {
-		padding: 10upx 25upx;
+		/* padding: 10upx 25upx; */
 	}
 </style>>

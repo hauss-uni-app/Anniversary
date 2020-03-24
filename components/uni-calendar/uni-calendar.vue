@@ -188,6 +188,10 @@
 			...mapActions(['getCurrentMonthSelected']),
 			// 取消穿透
 			clean() {},
+			setDateOuting(date) {
+				this.setDate(date)
+				return true;
+			},
 			init(date) {
 				this.months = this.cale.months;
 

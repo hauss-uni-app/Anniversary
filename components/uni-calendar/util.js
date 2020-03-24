@@ -116,7 +116,8 @@ class Calendar {
 							// debugger
 							let info = {
 								info: item_info.info.name,
-								days: item_detail.days
+								days: item_detail.days,
+								infoTitle: item_detail.infoTitle
 							};
 							infos.push(info);
 						}
