@@ -133,7 +133,7 @@ const store = new Vuex.Store({
 					para.date = date
 				}
 				uni.request({
-					url: 'https://localhost:44320/api/User',
+					url: 'http://192.168.15.107/api/User',
 					// url: 'http://192.168.15.107/api/User',
 					// url: 'http://120.25.215.190/api/User',
 					data: para,
@@ -158,7 +158,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = 'https://localhost:44320/api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
+				var requestUrl = 'http://192.168.15.107/api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
 					new Date(para.date).toLocaleDateString();
 
 				// var requestUrl = 'http://192.168.15.107/api/Info?openId=' + state.openid + '&name=' + para.name +
@@ -201,7 +201,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = 'https://localhost:44320/api/Info/Update?openId=' + state.openid +
+				var requestUrl = 'http://192.168.15.107/api/Info/Update?openId=' + state.openid +
 					'&infoId=' + para.infoId +
 					(para.name != undefined ? '&name=' + para.name : '') +
 					(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '');
@@ -248,7 +248,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = 'https://localhost:44320/api/Info/?openId=' + state.openid +
+				var requestUrl = 'http://192.168.15.107/api/Info/?openId=' + state.openid +
 					'&infoId=' + para.infoId;
 
 				uni.request({

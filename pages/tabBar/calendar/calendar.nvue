@@ -42,9 +42,10 @@
 				console.log('aaaaaaa')
 				if (this.selectedDate != '') {
 					console.log("onLoad-this.selectedDate", this.$refs);
-					this.$refs.calendar.setDate(this.selectedDate);
+					if (this.$refs.calendar.setDate != undefined)
+						this.$refs.calendar.setDate(this.selectedDate);
 					this.setSelectedDate('');
-				}else{
+				} else {
 					await this.getCurrentMonthSelected()
 				}
 				this.showCalendar = true

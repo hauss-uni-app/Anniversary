@@ -5,22 +5,34 @@
 			<uni-section class="uni-navigate-text" v-if="true" :title="item.infoTitle" :subTitle="getDate(item.date)" type="line"></uni-section>
 		</uni-swipe-action>
 
-		<uni-fab ref="fab" :pattern="pattern" :content="content" :horizontal="horizontal" :vertical="vertical" :direction="direction"
-		 @trigger="trigger" />
+		<uni-fab ref="fab" :pattern="pattern" :horizontal="horizontal" :vertical="vertical" :direction="direction" @trigger="trigger"
+		 @clickFab="clickFab" />
 
 		<uni-popup :show="showtip" :type="type" :mask-click="false" @change="change">
 			<view class="uni-tip">
-				<text class="uni-tip-title">添加记日</text>
+				<text class="uni-tip-title">添加该日之后的</text>
 				<view class="uni-list-cell">
-					<input class="uni-input" focus :placeholder="tittlePlaceholder" @input="onKeyInput" :value="tittle"
+					<input class="uni-input" type="number" focus :placeholder="numberPlaceholder" @input="onKeyInput" :value="number"
 					 placeholder-style="color:#F76260" />
 				</view>
 
-				<picker mode="date" :value="nowDate" @change="bindDateChange">
+				<!-- 				<picker mode="date" :value="nowDate" @change="bindDateChange">
 					<view class="uni-list-cell">
 						<text class="uni-input">{{ nowDate }}</text>
 					</view>
-				</picker>
+				</picker> -->
+
+				<radio-group class="radio-group" name="radio" @change="radioChange">
+					<label>
+						<radio value="1" checked="true" color="#24CACA" /><text>日</text>
+					</label>
+					<label>
+						<radio value="2" color="#24CACA" /><text>月</text>
+					</label>
+					<label>
+						<radio value="3" color="#24CACA" /><text>年</text>
+					</label>
+				</radio-group>
 
 				<view class="uni-tip-group-button">
 					<text class="uni-tip-button" @click="cancel('tip',false)">取消</text>
@@ -88,14 +100,15 @@
 				showtip: false,
 				type: '',
 				nowDate: '',
-				tittle: '',
-				tittlePlaceholder: '标题不能为空',
-				tittlePlaceholdercolor: 'color:#7A7E83',
+				number: '',
+				numberPlaceholder: '数量不能为空',
+				numberPlaceholdercolor: 'color:#7A7E83',
 				nowDateTemp: '',
-				tittleTemp: '',
+				numberTemp: '',
 				isUpdate: false,
 				updateInfoId: '',
-				updateIndex: ''
+				updateIndex: '',
+				selectRadio: 1,
 			}
 		},
 		onReady() {
@@ -110,7 +123,7 @@
 			},
 			swipeclick(e) {
 				this.setSelectedDate(this.getDate(this.selectedItem.infoDetail[e.listIndex].date))
-				console.log('daymarkdetail', this.getDate(this.selectedItem.infoDetail[e.listIndex].date))
+				// console.log('daymarkdetail', this.getDate(this.selectedItem.infoDetail[e.listIndex].date))
 				uni.switchTab({
 					url: '/pages/tabBar/calendar/calendar'
 				})
@@ -120,13 +133,13 @@
 					case '修改':
 						{
 							this.isUpdate = true
-							console.log(e)
-							console.log(this.selected)
+							// console.log(e)
+							// console.log(this.selected)
 							this.updateInfoId = this.selected[e.listIndex].info.infoId
 							this.nowDate = this.nowDateTemp = this.getDate(this.selected[e.listIndex].infoDetail)
 							this.tittle = this.tittleTemp = this.selected[e.listIndex].info.name
-							console.log('this.nowDateTemp', this.nowDateTemp)
-							console.log('this.tittleTemp', this.tittleTemp)
+							// console.log('this.nowDateTemp', this.nowDateTemp)
+							// console.log('this.tittleTemp', this.tittleTemp)
 							this.content[e.index].active = true
 							this.togglePopup('center', 'tip')
 							this.showtip = true
@@ -144,6 +157,19 @@
 						break;
 				}
 
+			},
+			clickFab() {
+				if (this.showtip) {
+					this.showtip = false
+					this.$refs.fab.close()
+					this.tittle = ''
+					this.tittleTemp = ''
+					this.nowDate = helper.getDate().fullDate;
+					this.nowDateTemp = ''
+					this.updateInfoId = ''
+				} else {
+					this.togglePopup('center', 'tip')
+				}
 			},
 			trigger(e) {
 				this.content[e.index].active = !e.item.active
@@ -185,8 +211,10 @@
 						}
 					}
 				}
-				if (!isConfirm || this.tittle != '')
+				if (!isConfirm || this.tittle != '') {
 					this['show' + type] = false
+					this.$refs.fab.close()
+				}
 				this.tittle = ''
 				this.tittleTemp = ''
 				this.nowDate = helper.getDate().fullDate;
@@ -194,7 +222,7 @@
 				this.updateInfoId = ''
 			},
 			onKeyInput(e) {
-				this.tittle = e.detail.value;
+				this.number = e.detail.value;
 			},
 			bindDateChange(e) {
 				this.nowDate = e.detail.value;
@@ -203,6 +231,9 @@
 				if (date.length > 0) {
 					return helper.getDate(new Date(date)).fullDate;
 				}
+			},
+			radioChange(e) {
+				console.log(e)
 			}
 		},
 		onLoad(option) {
@@ -210,7 +241,7 @@
 			uni.setNavigationBarTitle({
 				title: this.selectedItem.info.name
 			})
-			console.log('this.selectedItem', this.selectedItem)
+			// console.log('this.selectedItem', this.selectedItem)
 		}
 	}
 </script>
@@ -272,5 +303,10 @@
 
 	.title {
 		/* padding: 10upx 25upx; */
+	}
+
+	.radio-group {
+		padding: 10px 0px 0px 10px;
+		font-size: 15px;
 	}
 </style>>

@@ -146,6 +146,7 @@
 		methods: {
 			_onClick() {
 				this.isShow = !this.isShow
+				this.$emit('clickFab')
 			},
 			open() {
 				this.isShow = true

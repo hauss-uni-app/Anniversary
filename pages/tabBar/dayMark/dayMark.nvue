@@ -4,8 +4,8 @@
 			<uni-section class="uni-navigate-text" v-if="true" :title="item.info.name" :subTitle="getDate(item.infoDetail)" type="line"></uni-section>
 		</uni-swipe-action>
 
-		<uni-fab ref="fab" :pattern="pattern" :content="content" :horizontal="horizontal" :vertical="vertical" :direction="direction"
-		 @trigger="trigger" />
+		<uni-fab ref="fab" :pattern="pattern" :horizontal="horizontal" :vertical="vertical" :direction="direction"
+		 @trigger="trigger"  @clickFab = "clickFab"/>
 
 		<uni-popup :show="showtip" :type="type" :mask-click="false" @change="change">
 			<view class="uni-tip">
@@ -77,12 +77,12 @@
 					selectedColor: '#7A7E83',
 					buttonColor: '#24CACA'
 				},
-				content: [{
-					iconPath: '/static/component.png',
-					selectedIconPath: '/static/component.png',
-					text: '记日',
-					active: false
-				}],
+				// content: [{
+				// 	iconPath: '/static/component.png',
+				// 	selectedIconPath: '/static/component.png',
+				// 	text: '记日',
+				// 	active: false
+				// }],
 				showtip: false,
 				type: '',
 				nowDate: '',
@@ -125,7 +125,7 @@
 							this.tittle = this.tittleTemp = this.selected[e.listIndex].info.name
 							// console.log('this.nowDateTemp', this.nowDateTemp)
 							// console.log('this.tittleTemp', this.tittleTemp)
-							this.content[e.index].active = true
+							// this.content[e.index].active = true
 							this.togglePopup('center', 'tip')
 							this.showtip = true
 							break;
@@ -143,9 +143,22 @@
 				}
 
 			},
+			clickFab(){
+				if (this.showtip) {
+					this.showtip = false
+					this.$refs.fab.close()
+					this.tittle = ''
+					this.tittleTemp = ''
+					this.nowDate = helper.getDate().fullDate;
+					this.nowDateTemp = ''
+					this.updateInfoId = ''
+				} else {
+					this.togglePopup('center', 'tip')
+				}
+			},
 			trigger(e) {
 				// console.log(e)
-				this.content[e.index].active = !e.item.active
+				// this.content[e.index].active = !e.item.active
 				this.togglePopup('center', 'tip')
 			},
 			change(e) {
@@ -185,8 +198,10 @@
 						}
 					}
 				}
-				if (!isConfirm || this.tittle != '')
+				if (!isConfirm || this.tittle != ''){
 					this['show' + type] = false
+					this.$refs.fab.close()
+				}
 				this.tittle = ''
 				this.tittleTemp = ''
 				this.nowDate = helper.getDate().fullDate;
