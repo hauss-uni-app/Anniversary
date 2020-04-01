@@ -116,8 +116,8 @@ class Calendar {
 							// debugger
 							let info = {
 								info: item_info.info.name,
-								days: item_detail.days,
-								infoTitle: item_detail.infoTitle
+								count: item_detail.count,
+								type: item_detail.type
 							};
 							infos.push(info);
 						}
@@ -197,7 +197,7 @@ class Calendar {
 
 		const nextDate = this.getDate(date, +1, 'month').fullDate
 		this.nextweeks = this._getWeek(nextDate).weeks
-		console.log('setDate', this._getWeek(date).weeks)
+		// console.log('setDate', this._getWeek(date).weeks)
 		this.weeks = this._getWeek(date).weeks
 	}
 	/**

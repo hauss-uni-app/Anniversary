@@ -219,7 +219,7 @@
 			},
 			getDate(date) {
 				if (date.length > 0) {
-					var lessDate = date.filter(f => f.days == 0);
+					var lessDate = date.filter(f => f.count == 0 && f.type == "日");
 					if (lessDate.length > 0)
 						// console.log(helper.getDate(new Date(lessDate[0].date)).fullDate);
 						return helper.getDate(new Date(lessDate[0].date)).fullDate;

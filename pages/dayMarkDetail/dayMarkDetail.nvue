@@ -2,7 +2,7 @@
 	<view>
 		<uni-swipe-action v-for="(item,index) in selectedItem.infoDetail" :key="index" :options="options1" :listIndex="index"
 		 @click="bindClick" @swipeclick="swipeclick">
-			<uni-section class="uni-navigate-text" v-if="true" :title="item.infoTitle" :subTitle="getDate(item.date)" type="line"></uni-section>
+			<uni-section class="uni-navigate-text" v-if="true" :title="item.count+' '+ item.type" :subTitle="getDate(item.date)" type="line"></uni-section>
 		</uni-swipe-action>
 
 		<uni-fab ref="fab" :pattern="pattern" :horizontal="horizontal" :vertical="vertical" :direction="direction" @trigger="trigger"

@@ -25,10 +25,9 @@ const store = new Vuex.Store({
 		},
 		setCurrentMonthSelected(state, selected) {
 			state.selected = selected;
-			console.log('state.selected aaa', selected)
 			if (selected.length > 0) {
-				if (selected[0].user > 0) {
-					state.version = selected[0].user[0].version
+				if (selected[0].user != null) {
+					state.version = selected[0].user.version
 				}
 			}
 			//console.log(state.selected);
@@ -67,6 +66,9 @@ const store = new Vuex.Store({
 		},
 		setOpenid(state, openid) {
 			state.openid = openid
+		},
+		setVersion(state, version) {
+			state.version = version
 		},
 		setTestTrue(state) {
 			state.testvuex = true
@@ -127,24 +129,61 @@ const store = new Vuex.Store({
 			state
 		}, date) {
 			return await new Promise((resolve, reject) => {
-				var para = {}
-				para.openId = state.openid
-				if (date != undefined) {
-					para.date = date
-				}
+
+				//check whether local version is different from the server`s
 				uni.request({
-					url: 'http://192.168.15.107/api/User',
-					// url: 'http://192.168.15.107/api/User',
-					// url: 'http://120.25.215.190/api/User',
-					data: para,
-					sslVerify: false,
+					url: 'https://localhost:44320/api/User/Version',
+					data: state.openid,
+					sslVerify: false
 				}).then(res => {
-					const selected = res[1].data.response
-					console.log('request selected', selected)
-					commit("setCurrentMonthSelected", selected)
-					resolve(selected)
+					if (res != undefined) {
+						if (res[1].data != undefined) {
+							if (res[1].data.response != undefined) {
+								const version = res[1].data.response
+								console.log('version',version)
+								console.log('stateversion',state.version)
+								if (version != state.version) {
+									//get lastest info
+									var para = {}
+									para.openId = state.openid
+									if (date != undefined) {
+										// para.date = date
+									}
+									uni.request({
+										url: 'https://localhost:44320/api/User',
+										// url: 'http://192.168.15.107/api/User',
+										// url: 'http://120.25.215.190/api/User',
+										data: para,
+										sslVerify: false,
+									}).then(res => {
+										if (res != undefined) {
+											if (res[1].data != undefined) {
+												if (res[1].data.response != undefined) {
+													const selected = res[1].data.response
+													console.log('request selected', selected)
+
+													//set local select and version
+													commit("setCurrentMonthSelected", selected)
+													resolve(selected)
+												}
+											}
+										}
+										resolve(null)
+									}).catch(err => {
+										//console.log('request fail', err);
+										uni.showModal({
+											content: err.errMsg,
+										});
+										reject(err)
+									});
+								}else{
+									resolve(state.selected)
+								}
+							}
+						}
+					}
 				}).catch(err => {
-					console.log('request fail', err);
+					// console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
 					});
@@ -158,7 +197,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = 'http://192.168.15.107/api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
+				var requestUrl = 'https://localhost:44320/api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
 					new Date(para.date).toLocaleDateString();
 
 				// var requestUrl = 'http://192.168.15.107/api/Info?openId=' + state.openid + '&name=' + para.name +
@@ -187,7 +226,7 @@ const store = new Vuex.Store({
 					}
 					resolve(null)
 				}).catch(err => {
-					console.log('request fail', err);
+					// console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
 					});
@@ -201,7 +240,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = 'http://192.168.15.107/api/Info/Update?openId=' + state.openid +
+				var requestUrl = 'https://localhost:44320/api/Info/Update?openId=' + state.openid +
 					'&infoId=' + para.infoId +
 					(para.name != undefined ? '&name=' + para.name : '') +
 					(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '');
@@ -233,7 +272,7 @@ const store = new Vuex.Store({
 					}
 					resolve(null)
 				}).catch(err => {
-					console.log('request fail', err);
+					// console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
 						// showCancel: false
@@ -248,7 +287,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = 'http://192.168.15.107/api/Info/?openId=' + state.openid +
+				var requestUrl = 'https://localhost:44320/api/Info/?openId=' + state.openid +
 					'&infoId=' + para.infoId;
 
 				uni.request({
@@ -271,7 +310,7 @@ const store = new Vuex.Store({
 					}
 					resolve(null)
 				}).catch(err => {
-					console.log('request fail', err);
+					// console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
 						// showCancel: false
@@ -280,6 +319,9 @@ const store = new Vuex.Store({
 				});
 			})
 		},
+
+		
+
 	},
 })
 
