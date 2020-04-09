@@ -122,22 +122,36 @@
 				await this.getCurrentMonthSelected()
 			},
 			swipeclick(e) {
-				this.setSelectedDate(this.getDate(this.selectedItem.infoDetail[e.listIndex].date))
+				var listIndex;
+				if (e.listIndex == undefined) {
+					listIndex = e;
+				}else{
+					listIndex = e.listIndex;
+				}
+				
+				this.setSelectedDate(this.getDate(this.selectedItem.infoDetail[listIndex].date))
 				// console.log('daymarkdetail', this.getDate(this.selectedItem.infoDetail[e.listIndex].date))
 				uni.switchTab({
 					url: '/pages/tabBar/calendar/calendar'
 				})
 			},
 			bindClick(e) {
+				var listIndex;
+				if (e.listIndex == undefined) {
+					listIndex = e;
+				}else{
+					listIndex = e.listIndex;
+				}
+				
 				switch (e.content.text) {
 					case '修改':
 						{
 							this.isUpdate = true
 							// console.log(e)
 							// console.log(this.selected)
-							this.updateInfoId = this.selected[e.listIndex].info.infoId
-							this.nowDate = this.nowDateTemp = this.getDate(this.selected[e.listIndex].infoDetail)
-							this.tittle = this.tittleTemp = this.selected[e.listIndex].info.name
+							this.updateInfoId = this.selected[listIndex].info.infoId
+							this.nowDate = this.nowDateTemp = this.getDate(this.selected[listIndex].infoDetail)
+							this.tittle = this.tittleTemp = this.selected[listIndex].info.name
 							// console.log('this.nowDateTemp', this.nowDateTemp)
 							// console.log('this.tittleTemp', this.tittleTemp)
 							this.content[e.index].active = true
@@ -148,7 +162,7 @@
 					case '删除':
 						{
 							var para = {
-								'infoId': this.selected[e.listIndex].info.infoId
+								'infoId': this.selected[listIndex].info.infoId
 							}
 							this.callDeleteInfo(para);
 							break;
@@ -237,6 +251,8 @@
 			}
 		},
 		onLoad(option) {
+			console.log(option)
+			console.log(decodeURIComponent(option.item))
 			this.selectedItem = JSON.parse(decodeURIComponent(option.item));
 			uni.setNavigationBarTitle({
 				title: this.selectedItem.info.name

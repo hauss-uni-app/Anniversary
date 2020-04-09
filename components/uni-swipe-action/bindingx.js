@@ -53,7 +53,7 @@ export default {
 		itemClick(listIndex){
 			console.log("aaa",listIndex);
 			this.$emit('swipeclick', listIndex)
-		}
+		},
 		touchstart(e) {
 			if (this.isInAnimation) return
 			if (this.stop) return

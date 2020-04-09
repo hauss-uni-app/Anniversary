@@ -17,7 +17,8 @@
 	import helper from '@/common/helper.js';
 	import {
 		mapState,
-		mapMutations
+		mapMutations,
+		mapActions
 	} from 'vuex'
 	export default {
 		components: {
@@ -45,6 +46,7 @@
 
 		methods: {
 			...mapMutations(['login', 'setUserInfo','getUserInfo','clearUserInfo']),
+			...mapActions(['getCurrentMonthSelected']),
 			toLogin() {
 				uni.getStorage({
 					key: 'hasLogin',
@@ -58,9 +60,11 @@
 								success: (res) => {
 									console.log('userInfo success:', res.data);
 									this.setUserInfo(res.data);
+									this.getCurrentMonthSelected();
 								},
 								fail: () => {
 									console.log('userInfo fail:');
+									this.clearStorage();
 								}
 							})
 						}
@@ -86,6 +90,7 @@
 								},
 								fail: (err) => {
 									console.log('login fail:', err);
+									this.clearStorage();
 								}
 							});
 						}
@@ -102,6 +107,7 @@
 					success: (result) => {
 						console.log('getUserInfo success', result);
 						this.setUserInfo(result.userInfo);
+						this.getCurrentMonthSelected();
 					},
 					fail: (error) => {
 						console.log('getUserInfo fail', error);

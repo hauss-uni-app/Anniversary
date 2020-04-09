@@ -3,7 +3,8 @@
 		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected" />
 		<view class="content">
 			<view class="uni-navigate-item" v-for="(item, index) in itemArr" :key="index">
-				<uni-section class="uni-navigate-text" v-if="showSection" :title="item.info" :subTitle="item.count+' '+ item.type" type="line"></uni-section>
+				<uni-section class="uni-navigate-text" v-if="showSection" :title="item.info" :subTitle="item.count+' '+ item.type"
+				 type="line"></uni-section>
 			</view>
 		</view>
 	</view>
@@ -33,7 +34,7 @@
 			}
 		},
 		computed: {
-			...mapState(['selected', 'selectedDate'])
+			...mapState(['selected', 'selectedDate', 'openid'])
 		},
 		methods: {
 			...mapActions(['getCurrentMonthSelected']),
@@ -45,7 +46,8 @@
 					if (this.$refs.calendar.setDate != undefined)
 						this.$refs.calendar.setDate(this.selectedDate);
 					this.setSelectedDate('');
-				} 
+				} else if (this.$refs.calendar.setDate != undefined)
+					this.$refs.calendar.setDate();
 			},
 			change(e) {
 				// console.log(e)
@@ -68,6 +70,7 @@
 		},
 		onShow() {
 			// uni.startPullDownRefresh();
+			console.log('onShow')
 			this.getCurrentMonth(new Date().toLocaleDateString())
 			// uni.stopPullDownRefresh();
 		}

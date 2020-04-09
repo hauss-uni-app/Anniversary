@@ -7,7 +7,8 @@
 
 	export default {
 		onLaunch: function() {
-			this.setOpenid('123456')
+			// if (state.openid == null)
+			// 	this.setOpenid('oRrdQt82aW4Jj-bEP1QhE3DKR9Ew')
 			// this.getCurrentMonthSelected(new Date().toLocaleDateString())
 			this.getCurrentMonthSelected()
 			console.log('App Launch')
@@ -20,7 +21,12 @@
 		},
 		methods: {
 			...mapActions(['getCurrentMonthSelected']),
-			...mapMutations(['setOpenid'])
+			...mapMutations(['setOpenid']),
+			...mapState({
+				loginProvider: state => state.loginProvider,
+				hasLogin: state => state.hasLogin,
+				userInfo: state => state.userInfo
+			})
 		}
 	}
 </script>

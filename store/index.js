@@ -8,7 +8,7 @@ const store = new Vuex.Store({
 		allData: [],
 		hasLogin: false,
 		loginProvider: "",
-		openid: "123456",
+		openid: "",
 		testvuex: false,
 		selected: [],
 		colorIndex: 0,
@@ -16,6 +16,7 @@ const store = new Vuex.Store({
 			nickName: "您未登录",
 			avatarUrl: "/static/calender_press.png"
 		},
+		url: "http://120.25.215.190/",
 		version: 0,
 		selectedDate: ''
 	},
@@ -85,12 +86,14 @@ const store = new Vuex.Store({
 				avatarUrl: "/static/calender_press.png"
 			};
 			state.openid = null;
+			state.selected = [];
 		},
 		setUserInfo(state, userInfo) {
 			uni.setStorage({
 				key: 'userInfo',
 				data: userInfo,
 				success: (res) => {
+					console.log('userInfo subcc', userInfo.openId)
 					state.userInfo = userInfo
 					state.openid = userInfo.openId
 				},
@@ -112,7 +115,7 @@ const store = new Vuex.Store({
 				fail: () => {
 					uni.showModal({
 						title: '读取数据失败',
-						content: "找不到 key 对应的数据",
+						content: "请登录",
 						showCancel: false
 					})
 				}
@@ -129,10 +132,10 @@ const store = new Vuex.Store({
 			state
 		}, date) {
 			return await new Promise((resolve, reject) => {
-
+				console.log(state.openid)
 				//check whether local version is different from the server`s
 				uni.request({
-					url: 'https://localhost:44320/api/User/Version',
+					url: state.url + 'api/User/Version',
 					data: state.openid,
 					sslVerify: false
 				}).then(res => {
@@ -150,7 +153,7 @@ const store = new Vuex.Store({
 										// para.date = date
 									}
 									uni.request({
-										url: 'https://localhost:44320/api/User',
+										url: state.url + 'api/User',
 										// url: 'http://192.168.15.107/api/User',
 										// url: 'http://120.25.215.190/api/User',
 										data: para,
@@ -197,7 +200,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = 'https://localhost:44320/api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
+				var requestUrl = state.url + 'api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
 					new Date(para.date).toLocaleDateString();
 
 				// var requestUrl = 'http://192.168.15.107/api/Info?openId=' + state.openid + '&name=' + para.name +
@@ -240,18 +243,10 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = 'https://localhost:44320/api/Info/Update?openId=' + state.openid +
+				var requestUrl = state.url + 'api/Info/Update?openId=' + state.openid +
 					'&infoId=' + para.infoId +
 					(para.name != undefined ? '&name=' + para.name : '') +
 					(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '');
-				// var requestUrl = 'http://192.168.15.107/api/Info?openId=' + state.openid +
-				// 	'&infoId=' + para.infoId +
-				// 	(para.name != undefined ? '&name=' + para.name : '') +
-				// 	(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '')
-				// var requestUrl = 'http://120.25.215.190/api/Info?openId=' + state.openid +
-				// 	'&infoId=' + para.infoId +
-				// 	(para.name != undefined ? '&name=' + para.name : '') +
-				// 	(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '')
 				uni.request({
 					url: requestUrl,
 					method: 'PUT',
@@ -287,7 +282,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = 'https://localhost:44320/api/Info/?openId=' + state.openid +
+				var requestUrl = state.url + 'api/Info/?openId=' + state.openid +
 					'&infoId=' + para.infoId;
 
 				uni.request({

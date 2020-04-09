@@ -1,11 +1,12 @@
 <template>
 	<view>
-		<uni-swipe-action v-for="(item,index) in selected" :key="index" :options="options1" :listIndex="index" @click="bindClick" @swipeclick="swipeclick">
+		<uni-swipe-action v-for="(item,index) in selected" :key="index" :options="options1" :listIndex="index" @click="bindClick"
+		 @swipeclick="swipeclick">
 			<uni-section class="uni-navigate-text" v-if="true" :title="item.info.name" :subTitle="getDate(item.infoDetail)" type="line"></uni-section>
 		</uni-swipe-action>
 
-		<uni-fab ref="fab" :pattern="pattern" :horizontal="horizontal" :vertical="vertical" :direction="direction"
-		 @trigger="trigger"  @clickFab = "clickFab"/>
+		<uni-fab ref="fab" :pattern="pattern" :horizontal="horizontal" :vertical="vertical" :direction="direction" @trigger="trigger"
+		 @clickFab="clickFab" />
 
 		<uni-popup :show="showtip" :type="type" :mask-click="false" @change="change">
 			<view class="uni-tip">
@@ -109,8 +110,14 @@
 			},
 			swipeclick(e) {
 				// console.log(e)
+				var listIndex;
+				if (e.listIndex == undefined) {
+					listIndex = e;
+				}else{
+					listIndex = e.listIndex;
+				}
 				uni.navigateTo({
-				    url: '/pages/dayMarkDetail/dayMarkDetail?item='+ encodeURIComponent(JSON.stringify(this.selected[e.listIndex]))
+					url: '/pages/dayMarkDetail/dayMarkDetail?item=' + encodeURIComponent(JSON.stringify(this.selected[listIndex]))
 				})
 			},
 			bindClick(e) {
@@ -143,7 +150,7 @@
 				}
 
 			},
-			clickFab(){
+			clickFab() {
 				if (this.showtip) {
 					this.showtip = false
 					this.$refs.fab.close()
@@ -198,7 +205,7 @@
 						}
 					}
 				}
-				if (!isConfirm || this.tittle != ''){
+				if (!isConfirm || this.tittle != '') {
 					this['show' + type] = false
 					this.$refs.fab.close()
 				}
