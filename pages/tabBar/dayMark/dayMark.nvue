@@ -54,7 +54,7 @@
 			uniPopup
 		},
 		computed: {
-			...mapState(['selected', 'openid']),
+			...mapState(['selected', 'selectedDetail', 'hasLogin']),
 		},
 		data() {
 			return {
@@ -78,70 +78,56 @@
 					selectedColor: '#7A7E83',
 					buttonColor: '#24CACA'
 				},
-				// content: [{
-				// 	iconPath: '/static/component.png',
-				// 	selectedIconPath: '/static/component.png',
-				// 	text: '记日',
-				// 	active: false
-				// }],
 				showtip: false,
 				type: '',
 				nowDate: '',
 				tittle: '',
 				tittlePlaceholder: '标题不能为空',
-				tittlePlaceholdercolor: 'color:#7A7E83',
 				nowDateTemp: '',
 				tittleTemp: '',
 				isUpdate: false,
 				updateInfoId: '',
-				updateIndex: '',
 			}
 		},
 		onReady() {
-			// console.log('selected1', this.selected)
-			this.customLoad()
-			// console.log(helper.getDate());
+			this.customLoad();
 		},
 		methods: {
 			...mapActions(['getCurrentMonthSelected', 'addInfo', 'updateInfo', 'deleteInfo']),
+			...mapMutations(['setSelectedDetail']),
 			async customLoad() {
 				this.nowDate = helper.getDate().fullDate;
-				await this.getCurrentMonthSelected()
+				await this.getCurrentMonthSelected();
 			},
 			swipeclick(e) {
-				// console.log(e)
 				var listIndex;
 				if (e.listIndex == undefined) {
 					listIndex = e;
-				}else{
+				} else {
 					listIndex = e.listIndex;
 				}
+				this.setSelectedDetail(listIndex);
 				uni.navigateTo({
-					url: '/pages/dayMarkDetail/dayMarkDetail?item=' + encodeURIComponent(JSON.stringify(this.selected[listIndex]))
-				})
+					url: '/pages/dayMarkDetail/dayMarkDetail'
+				});
 			},
 			bindClick(e) {
 				switch (e.content.text) {
 					case '修改':
 						{
-							this.isUpdate = true
-							console.log(e)
-							console.log(this.selected)
-							this.updateInfoId = this.selected[e.listIndex].info.infoId
-							this.nowDate = this.nowDateTemp = this.getDate(this.selected[e.listIndex].infoDetail)
-							this.tittle = this.tittleTemp = this.selected[e.listIndex].info.name
-							// console.log('this.nowDateTemp', this.nowDateTemp)
-							// console.log('this.tittleTemp', this.tittleTemp)
-							// this.content[e.index].active = true
-							this.togglePopup('center', 'tip')
-							this.showtip = true
+							this.isUpdate = true;
+							this.updateInfoId = this.selected[e.listIndex].info.infoId;
+							this.nowDate = this.nowDateTemp = this.getDate(this.selected[e.listIndex].infoDetail);
+							this.tittle = this.tittleTemp = this.selected[e.listIndex].info.name;
+							this.togglePopup('center', 'tip');
+							this.showtip = true;
 							break;
 						}
 					case '删除':
 						{
 							var para = {
 								'infoId': this.selected[e.listIndex].info.infoId
-							}
+							};
 							this.callDeleteInfo(para);
 							break;
 						}
@@ -151,35 +137,39 @@
 
 			},
 			clickFab() {
-				if (this.showtip) {
-					this.showtip = false
-					this.$refs.fab.close()
-					this.tittle = ''
-					this.tittleTemp = ''
-					this.nowDate = helper.getDate().fullDate;
-					this.nowDateTemp = ''
-					this.updateInfoId = ''
+				if (!this.hasLogin) {
+					this.$refs.fab.close();
+					uni.switchTab({
+						url: '/pages/tabBar/user/user'
+					});
 				} else {
-					this.togglePopup('center', 'tip')
+					if (this.showtip) {
+						this.showtip = false;
+						this.$refs.fab.close();
+						this.tittle = '';
+						this.tittleTemp = '';
+						this.nowDate = helper.getDate().fullDate;
+						this.nowDateTemp = '';
+						this.updateInfoId = '';
+					} else {
+						this.togglePopup('center', 'tip');
+					}
 				}
 			},
 			trigger(e) {
-				// console.log(e)
-				// this.content[e.index].active = !e.item.active
-				this.togglePopup('center', 'tip')
+				this.togglePopup('center', 'tip');
 			},
 			change(e) {
-				// console.log('是否打开:' + e.show)
 				if (!e.show) {
-					this.showtip = false
+					this.showtip = false;
 				}
 			},
 			togglePopup(type, open) {
-				this.type = type
-				this['show' + open] = true
+				this.type = type;
+				this['show' + open] = true;
 			},
 			async callDeleteInfo(para) {
-				await this.deleteInfo(para)
+				await this.deleteInfo(para);
 			},
 			async cancel(type, isConfirm) {
 				if (isConfirm) {
@@ -188,53 +178,49 @@
 							if (this.nowDate != this.nowDateTemp || this.tittle != this.tittleTemp) {
 								var para = {
 									'infoId': this.updateInfoId,
-								}
+								};
 								if (this.nowDate != this.nowDateTemp)
-									para.date = this.nowDate
+									para.date = this.nowDate;
 								if (this.tittle != this.tittleTemp)
-									para.name = this.tittle
-								this.isUpdate = false
-								await this.updateInfo(para)
+									para.name = this.tittle;
+								this.isUpdate = false;
+								await this.updateInfo(para);
 							}
 						} else {
 							var para = {
 								'name': this.tittle,
 								'date': this.nowDate
-							}
+							};
 							await this.addInfo(para);
 						}
 					}
 				}
 				if (!isConfirm || this.tittle != '') {
-					this['show' + type] = false
-					this.$refs.fab.close()
+					this['show' + type] = false;
+					this.$refs.fab.close();
 				}
-				this.tittle = ''
-				this.tittleTemp = ''
+				this.tittle = '';
+				this.tittleTemp = '';
 				this.nowDate = helper.getDate().fullDate;
-				this.nowDateTemp = ''
-				this.updateInfoId = ''
-
+				this.nowDateTemp = '';
+				this.updateInfoId = '';
 			},
 			onKeyInput(e) {
-				// console.log('onKeyInput', e.detail.value);
 				this.tittle = e.detail.value;
 			},
 			bindDateChange(e) {
-				// console.log('bindDateChange', e.detail.value);
 				this.nowDate = e.detail.value;
 			},
 			getDate(date) {
 				if (date.length > 0) {
 					var lessDate = date.filter(f => f.count == 0 && f.type == "日");
 					if (lessDate.length > 0)
-						// console.log(helper.getDate(new Date(lessDate[0].date)).fullDate);
 						return helper.getDate(new Date(lessDate[0].date)).fullDate;
 				}
 			}
 		},
 		onLoad() {
-			this.platform = uni.getSystemInfoSync().platform
+			this.platform = uni.getSystemInfoSync().platform;
 		}
 	}
 </script>
@@ -287,11 +273,6 @@
 	.uni-input {
 		height: 40px;
 		font-size: 15px;
-	}
-
-	.with-fun {
-		/* -webkit-box-orient: horizontal; */
-		/* flex-direction: row; */
 	}
 
 	.title {

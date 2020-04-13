@@ -162,13 +162,7 @@
 		},
 		watch: {
 			selected(newVal) {
-				// console.log("watch selected");
 				this.setDate(this.nowDate.fullDate);
-				// this.nowDate = this.calendar = this.cale.getInfo(newVal.date)
-				// this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
-				// this.preweeks = this.cale.preweeks
-				// this.nextweeks = this.cale.nextweeks
-				// this.weeks = this.cale.weeks
 			}
 		},
 		created() {
@@ -179,51 +173,44 @@
 				startDate: this.startDate,
 				endDate: this.endDate,
 				range: this.range,
-			})
-			// console.log(this.cale.date.fullDate)
-			// this.init(this.cale.date.fullDate)
-			this.setDate(this.cale.date.fullDate)
+			});
+			this.setDate(this.cale.date.fullDate);
 		},
 		methods: {
 			...mapActions(['getCurrentMonthSelected']),
 			// 取消穿透
 			clean() {},
 			setDateOuting(date) {
-				this.setDate(date)
+				this.setDate(date);
 				return true;
 			},
 			init(date) {
 				this.months = this.cale.months;
-
-				this.weeks = this.cale.weeks
-				this.nowDate = this.calendar = this.cale.getInfo(date)
+				this.weeks = this.cale.weeks;
+				this.nowDate = this.calendar = this.cale.getInfo(date);
 				this.$nextTick(function() {
-					this.preweeks = this.cale.preweeks
-					this.nextweeks = this.cale.nextweeks
-					this.precalendar = this.calendar
-					this.nextcalendar = this.calendar
+					this.preweeks = this.cale.preweeks;
+					this.nextweeks = this.cale.nextweeks;
+					this.precalendar = this.calendar;
+					this.nextcalendar = this.calendar;
 				})
 			},
 			open() {
-				this.show = true
+				this.show = true;
 				this.$nextTick(() => {
-					this.aniMaskShow = true
+					this.aniMaskShow = true;
 				})
 			},
 			close() {
-				this.aniMaskShow = false
+				this.aniMaskShow = false;
 				this.$nextTick(() => {
 					setTimeout(() => {
-						this.show = false
+						this.show = false;
 					}, 300)
 				})
 			},
-			// confirm() {
-			// 	this.setEmit('confirm')
-			// 	this.close()
-			// },
 			change(weeks) {
-				this.setEmit('change', weeks)
+				this.setEmit('change', weeks);
 			},
 			setEmit(name, weeks) {
 				//console.log(weeks)
@@ -234,7 +221,7 @@
 					fullDate,
 					lunar,
 					extraInfo
-				} = weeks
+				} = weeks;
 				this.$emit(name, {
 					range: this.cale.multipleStatus,
 					year,
@@ -243,24 +230,21 @@
 					fulldate: fullDate,
 					lunar,
 					extraInfo: extraInfo || {}
-				})
+				});
 			},
 			choiceDate(weeks) {
-				// //console.log(weeks)
-				if (weeks.disable) return
+				if (weeks.disable) return;
 
-				// this.$nextTick(function() {
 				if (this.currentIndex == 0)
-					this.precalendar = weeks
+					this.precalendar = weeks;
 				if (this.currentIndex == 1)
-					this.calendar = weeks
+					this.calendar = weeks;
 				if (this.currentIndex == 2)
-					this.nextcalendar = weeks
-				this.change(weeks)
-				// });
+					this.nextcalendar = weeks;
+				this.change(weeks);
 			},
 			backtoday() {
-				this.setDate(new Date().toLocaleDateString())
+				this.setDate(new Date().toLocaleDateString());
 			},
 			pre() {
 				const {
@@ -269,73 +253,69 @@
 					month,
 					date,
 					day
-				} = this.cale.getDate(this.nowDate.fullDate, -1, 'month')
+				} = this.cale.getDate(this.nowDate.fullDate, -1, 'month');
 
-				const preDate = new Date(year, month - 1, 1).toLocaleDateString()
-				this.setDate(preDate)
+				const preDate = new Date(year, month - 1, 1).toLocaleDateString();
+				this.setDate(preDate);
 			},
 			next() {
-				// debugger
 				const {
 					fullDate,
 					year,
 					month,
 					date,
 					day
-				} = this.cale.getDate(this.nowDate.fullDate, +1, 'month')
+				} = this.cale.getDate(this.nowDate.fullDate, +1, 'month');
 
-				const nextDate = new Date(year, month - 1, 1).toLocaleDateString()
+				const nextDate = new Date(year, month - 1, 1).toLocaleDateString();
 
-				this.setDate(nextDate)
+				this.setDate(nextDate);
 			},
 			async setDate(date) {
-				var preweeks = []
-				var nextweeks = []
-				var weeks = []
+				var preweeks = [];
+				var nextweeks = [];
+				var weeks = [];
 
-				// await this.getCurrentMonthSelected(date)
-				this.cale.setDate(date)
-				this.cale.selected = this.selected
-				// console.log('currentindex', this.currentIndex)
+				this.cale.setDate(date);
+				this.cale.selected = this.selected;
 				if (this.currentIndex == 1) {
-					weeks = this.cale.weeks
-					this.nowDate = this.calendar = this.cale.getInfo(date)
-					this.weeks = weeks
+					weeks = this.cale.weeks;
+					this.nowDate = this.calendar = this.cale.getInfo(date);
+					this.weeks = weeks;
 					this.$nextTick(function() {
-						this.change(this.calendar)
-						preweeks = this.cale.preweeks
-						nextweeks = this.cale.nextweeks
-						this.preweeks = preweeks
-						this.nextweeks = nextweeks
-					})
+						this.change(this.calendar);
+						preweeks = this.cale.preweeks;
+						nextweeks = this.cale.nextweeks;
+						this.preweeks = preweeks;
+						this.nextweeks = nextweeks;
+					});
 				} else if (this.currentIndex == 0) {
-					preweeks = this.cale.weeks
+					preweeks = this.cale.weeks;
 
-					this.nowDate = this.precalendar = this.cale.getInfo(date)
-					this.preweeks = preweeks
+					this.nowDate = this.precalendar = this.cale.getInfo(date);
+					this.preweeks = preweeks;
 					this.$nextTick(function() {
-						this.change(this.precalendar)
-						nextweeks = this.cale.preweeks
-						weeks = this.cale.nextweeks
-						this.weeks = weeks
-						this.nextweeks = nextweeks
-					})
+						this.change(this.precalendar);
+						nextweeks = this.cale.preweeks;
+						weeks = this.cale.nextweeks;
+						this.weeks = weeks;
+						this.nextweeks = nextweeks;
+					});
 				} else if (this.currentIndex == 2) {
-					nextweeks = this.cale.weeks
-					this.nowDate = this.nextcalendar = this.cale.getInfo(date)
-					this.nextweeks = nextweeks
+					nextweeks = this.cale.weeks;
+					this.nowDate = this.nextcalendar = this.cale.getInfo(date);
+					this.nextweeks = nextweeks;
 					this.$nextTick(function() {
-						this.change(this.nextcalendar)
-						weeks = this.cale.preweeks
-						preweeks = this.cale.nextweeks
-						this.weeks = weeks
-						this.preweeks = preweeks
-					})
+						this.change(this.nextcalendar);
+						weeks = this.cale.preweeks;
+						preweeks = this.cale.nextweeks;
+						this.weeks = weeks;
+						this.preweeks = preweeks;
+					});
 				}
 			},
 			swiperChange(e) {
 				let index = e.detail.current;
-				// //console.log(e);
 
 				let isPrev = (index - this.lastIndex == -1 || index - this.lastIndex == 2) ? true : false;
 				this.currentIndex = index;
@@ -347,8 +327,7 @@
 				this.lastIndex = index;
 			},
 			bindDateChange: function(e) {
-				// console.log(e);
-				this.setDate(e.detail.value)
+				this.setDate(e.detail.value);
 			},
 		}
 

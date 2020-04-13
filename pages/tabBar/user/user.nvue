@@ -1,14 +1,19 @@
 <template>
 	<view>
-		<view class="user-info" @click="toLogin">
+		<view class="user-info">
 			<image s class="userinfo-avatar" :src="userInfo.avatarUrl"></image>
 			<view class="uni-h4 uni-center uni-common-mt userinfo-tittle-contain">
 				<text class="userinfo-tittle-text">Hi~ {{userInfo.nickName}}</text>
 			</view>
 		</view>
-		<button @tap="clearStorage">清理数据</button>
+		<!-- #ifndef APP-NVUE -->
+			<button v-if="!hasLogin" open-type="getUserInfo" lang="zh_CN" @getuserinfo="toLogin" withCredentials="true">登录</button>
+		<!-- #endif -->
+		<!-- #ifdef APP-NVUE -->
+			<button v-if="!hasLogin" @tap="toLogin">登录</button>
+		<!-- #endif -->
+		<button v-if="hasLogin" @tap="clearStorage">退出登录</button>
 	</view>
-
 </template>
 
 <script>
@@ -33,7 +38,7 @@
 					type: 'weixin'
 				},
 				providerList: [],
-
+				loginProgress: false
 			}
 		},
 		computed: {
@@ -45,36 +50,43 @@
 		},
 
 		methods: {
-			...mapMutations(['login', 'setUserInfo','getUserInfo','clearUserInfo']),
+			...mapMutations(['login', 'setUserInfo', 'getUserInfo', 'clearUserInfo', 'logout']),
 			...mapActions(['getCurrentMonthSelected']),
-			toLogin() {
+			toLogin(e) {
+				this.loginProgress = true
 				uni.getStorage({
 					key: 'hasLogin',
 					success: (res) => {
 						if (!res.data) {
-							this.getProvider();
+							this.getProvider(e);
 						} else {
-							console.log('userInfo ');
 							uni.getStorage({
 								key: 'userInfo',
 								success: (res) => {
-									console.log('userInfo success:', res.data);
 									this.setUserInfo(res.data);
 									this.getCurrentMonthSelected();
+									this.loginProgress = false
 								},
 								fail: () => {
-									console.log('userInfo fail:');
 									this.clearStorage();
+									this.loginProgress = false
 								}
 							})
 						}
 					},
 					fail: () => {
-						this.getProvider();
+						this.getProvider(e);
+						this.loginProgress = false
 					}
 				})
 			},
-			getProvider() {
+			onGotUserInfo(e) {
+				console.log(e.detail.errMsg)
+				console.log(e.detail.userInfo)
+				console.log(e.detail.rawData)
+			},
+			getProvider(e) {
+				// #ifdef APP-NVUE
 				uni.getProvider({
 					service: 'oauth',
 					success: (res) => {
@@ -85,32 +97,38 @@
 								scopes: 'auth_user', //支付宝小程序需设置授权类型
 								success: (loginRes) => {
 									this.login('weixin');
-									console.log('login success:', loginRes);
 									this.getInfo();
+									this.loginProgress = false
 								},
 								fail: (err) => {
-									console.log('login fail:', err);
 									this.clearStorage();
+									this.loginProgress = false
 								}
 							});
 						}
 					},
 					fail: (error) => {
-						console.log('获取登录通道失败', error);
+						this.loginProgress = false
 					}
 				});
+				// #endif
+				// #ifdef APP-PLUS || MP-WEIXIN || H5
+				this.setUserInfo(e.detail.userInfo);
+				this.getCurrentMonthSelected();
+				this.loginProgress = false
+				// #endif
 			},
 			// 获取用户信息 API 在小程序可直接使用，在 5+App 里面需要先登录才能调用
 			getInfo() {
 				uni.getUserInfo({
 					provider: this.loginProvider,
 					success: (result) => {
-						console.log('getUserInfo success', result);
 						this.setUserInfo(result.userInfo);
 						this.getCurrentMonthSelected();
+						this.loginProgress = false
 					},
 					fail: (error) => {
-						console.log('getUserInfo fail', error);
+						this.loginProgress = false
 						let content = error.errMsg;
 						if (~content.indexOf('uni.login')) {
 							content = '请在登录页面完成登录操作';
@@ -165,6 +183,7 @@
 				uni.clearStorageSync()
 				this.clear()
 				this.clearUserInfo()
+				this.logout()
 				uni.showModal({
 					title: '清除数据成功',
 					content: ' ',
@@ -172,9 +191,14 @@
 				})
 			}
 		},
-		onLoad() {
-			console.log('onload');
-			this.getUserInfo();
+		onShow() {
+			if (!this.hasLogin && !this.loginProgress) {
+				uni.showModal({
+					title: '请登录',
+					content: ' ',
+					showCancel: false
+				})
+			}
 		},
 	}
 </script>

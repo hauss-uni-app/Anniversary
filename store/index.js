@@ -8,7 +8,7 @@ const store = new Vuex.Store({
 		allData: [],
 		hasLogin: false,
 		loginProvider: "",
-		openid: "",
+		openid: "oRrdQt82aW4Jj-bEP1QhE3DKR9Ew",
 		testvuex: false,
 		selected: [],
 		colorIndex: 0,
@@ -18,21 +18,10 @@ const store = new Vuex.Store({
 		},
 		url: "http://120.25.215.190/",
 		version: 0,
-		selectedDate: ''
+		selectedDate: '',
+		selectedDetail: [],
 	},
 	mutations: {
-		setAllData(state, allData) {
-			state.allData = allData;
-		},
-		setCurrentMonthSelected(state, selected) {
-			state.selected = selected;
-			if (selected.length > 0) {
-				if (selected[0].user != null) {
-					state.version = selected[0].user.version
-				}
-			}
-			//console.log(state.selected);
-		},
 		login(state, provider) {
 			uni.setStorage({
 				key: 'hasLogin',
@@ -65,21 +54,6 @@ const store = new Vuex.Store({
 				}
 			})
 		},
-		setOpenid(state, openid) {
-			state.openid = openid
-		},
-		setVersion(state, version) {
-			state.version = version
-		},
-		setTestTrue(state) {
-			state.testvuex = true
-		},
-		setTestFalse(state) {
-			state.testvuex = false
-		},
-		setColorIndex(state, index) {
-			state.colorIndex = index
-		},
 		clearUserInfo(state) {
 			state.userInfo = {
 				nickName: "您未登录",
@@ -93,7 +67,7 @@ const store = new Vuex.Store({
 				key: 'userInfo',
 				data: userInfo,
 				success: (res) => {
-					console.log('userInfo subcc', userInfo.openId)
+					state.hasLogin = true
 					state.userInfo = userInfo
 					state.openid = userInfo.openId
 				},
@@ -111,11 +85,11 @@ const store = new Vuex.Store({
 				success: (res) => {
 					state.userInfo = res.data
 					state.openid = res.data.openId
+					state.hasLogin = true
 				},
 				fail: () => {
 					uni.showModal({
-						title: '读取数据失败',
-						content: "请登录",
+						title: '请登录',
 						showCancel: false
 					})
 				}
@@ -123,6 +97,12 @@ const store = new Vuex.Store({
 		},
 		setSelectedDate(state, date) {
 			state.selectedDate = date
+		},
+		setSelectedDetail(state, detail) {
+			state.selectedDetail = detail
+		},
+		setCurrentMonthSelected(state, selected) {
+			state.selected = selected
 		}
 	},
 	actions: {
@@ -132,7 +112,6 @@ const store = new Vuex.Store({
 			state
 		}, date) {
 			return await new Promise((resolve, reject) => {
-				console.log(state.openid)
 				//check whether local version is different from the server`s
 				uni.request({
 					url: state.url + 'api/User/Version',
@@ -143,8 +122,6 @@ const store = new Vuex.Store({
 						if (res[1].data != undefined) {
 							if (res[1].data.response != undefined) {
 								const version = res[1].data.response
-								console.log('version',version)
-								console.log('stateversion',state.version)
 								if (version != state.version) {
 									//get lastest info
 									var para = {}
@@ -163,7 +140,6 @@ const store = new Vuex.Store({
 											if (res[1].data != undefined) {
 												if (res[1].data.response != undefined) {
 													const selected = res[1].data.response
-													console.log('request selected', selected)
 
 													//set local select and version
 													commit("setCurrentMonthSelected", selected)
@@ -173,20 +149,18 @@ const store = new Vuex.Store({
 										}
 										resolve(null)
 									}).catch(err => {
-										//console.log('request fail', err);
 										uni.showModal({
 											content: err.errMsg,
 										});
 										reject(err)
 									});
-								}else{
+								} else {
 									resolve(state.selected)
 								}
 							}
 						}
 					}
 				}).catch(err => {
-					// console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
 					});
@@ -202,14 +176,6 @@ const store = new Vuex.Store({
 			return await new Promise((resolve, reject) => {
 				var requestUrl = state.url + 'api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
 					new Date(para.date).toLocaleDateString();
-
-				// var requestUrl = 'http://192.168.15.107/api/Info?openId=' + state.openid + '&name=' + para.name +
-				// 	'&date=' +
-				// 	new Date(para.date).toLocaleDateString();
-
-				// var requestUrl = 'http://120.25.215.190/api/Info?openId=' + state.openid + '&name=' + para.name +
-				// 	'&date=' +
-				// 	new Date(para.date).toLocaleDateString();
 				uni.request({
 					// url: 'http://192.168.15.107:8012/api/Info',
 					url: requestUrl,
@@ -229,7 +195,6 @@ const store = new Vuex.Store({
 					}
 					resolve(null)
 				}).catch(err => {
-					// console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
 					});
@@ -243,7 +208,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = state.url + 'api/Info/Update?openId=' + state.openid +
+				var requestUrl = state.url + 'api/Info?openId=' + state.openid +
 					'&infoId=' + para.infoId +
 					(para.name != undefined ? '&name=' + para.name : '') +
 					(para.date != undefined ? '&date=' + new Date(para.date).toLocaleDateString() : '');
@@ -267,7 +232,6 @@ const store = new Vuex.Store({
 					}
 					resolve(null)
 				}).catch(err => {
-					// console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
 						// showCancel: false
@@ -282,7 +246,7 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
-				var requestUrl = state.url + 'api/Info/?openId=' + state.openid +
+				var requestUrl = state.url + 'api/Info?openId=' + state.openid +
 					'&infoId=' + para.infoId;
 
 				uni.request({
@@ -305,7 +269,6 @@ const store = new Vuex.Store({
 					}
 					resolve(null)
 				}).catch(err => {
-					// console.log('request fail', err);
 					uni.showModal({
 						content: err.errMsg,
 						// showCancel: false
@@ -315,8 +278,111 @@ const store = new Vuex.Store({
 			})
 		},
 
-		
+		addInfoDetail: async function({
+			commit,
+			state
+		}, para) {
+			return await new Promise((resolve, reject) => {
+				var requestUrl = state.url + 'api/InfoDetail?openId=' + state.openid +
+					'&infoId=' + para.infoId + '&addCount=' + para.addCount + '&type=' + para.dateType;
+				uni.request({
+					// url: 'http://192.168.15.107:8012/api/Info',
+					url: requestUrl,
+					method: 'POST',
+					header: {
+						'content-type': 'application/x-www-form-urlencoded',
+					}
+				}).then(res => {
+					if (res != undefined) {
+						if (res[1].data != undefined) {
+							if (res[1].data.response != undefined) {
+								const selected = res[1].data.response
+								commit("setCurrentMonthSelected", selected)
+								resolve(selected)
+							}
+						}
+					}
+					resolve(null)
+				}).catch(err => {
+					uni.showModal({
+						content: err.errMsg,
+					});
+					reject(err)
+				});
+			})
+		},
+		updateInfoDetail: async function({
+			commit,
+			state
+		}, para) {
+			return await new Promise((resolve, reject) => {
+				var requestUrl = state.url + 'api/InfoDetail?openId=' + state.openid +
+					'&infoId=' + para.infoId + '&infoDetailId=' + para.infoDetailId + '&addCount=' + para.addCount + '&type=' +
+					para.type;
+				uni.request({
+					url: requestUrl,
+					method: 'PUT',
+					header: {
+						'content-type': 'application/x-www-form-urlencoded',
+					}
+				}).then(res => {
+					if (res != undefined) {
+						if (res[1] != undefined) {
+							if (res[1].data != undefined) {
+								if (res[1].data.response != undefined) {
+									const selected = res[1].data.response
+									commit("setCurrentMonthSelected", selected)
+									resolve(selected)
+								}
+							}
+						}
+					}
+					resolve(null)
+				}).catch(err => {
+					uni.showModal({
+						content: err.errMsg,
+						// showCancel: false
+					});
+					reject(err)
+				});
+			})
+		},
+		deleteInfoDetail: async function({
+			commit,
+			state
+		}, para) {
+			return await new Promise((resolve, reject) => {
+				var requestUrl = state.url + 'api/InfoDetail?openId=' + state.openid +
+					'&infoDetailId=' + para.infoDetailId;
 
+				uni.request({
+					url: requestUrl,
+					method: 'DELETE',
+					header: {
+						'content-type': 'application/x-www-form-urlencoded',
+					}
+				}).then(res => {
+					if (res != undefined) {
+						if (res[1] != undefined) {
+							if (res[1].data != undefined) {
+								if (res[1].data.response != undefined) {
+									const selected = res[1].data.response
+									commit("setCurrentMonthSelected", selected)
+									resolve(selected)
+								}
+							}
+						}
+					}
+					resolve(null)
+				}).catch(err => {
+					uni.showModal({
+						content: err.errMsg,
+						// showCancel: false
+					});
+					reject(err)
+				});
+			})
+		},
 	},
 })
 

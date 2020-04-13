@@ -2,7 +2,8 @@
 	<view>
 		<uni-swipe-action v-for="(item,index) in selectedItem.infoDetail" :key="index" :options="options1" :listIndex="index"
 		 @click="bindClick" @swipeclick="swipeclick">
-			<uni-section class="uni-navigate-text" v-if="true" :title="item.count+' '+ item.type" :subTitle="getDate(item.date)" type="line"></uni-section>
+			<uni-section class="uni-navigate-text" v-if="true" :title="item.count+' '+ item.type" :subTitle="getDate(item.date)"
+			 type="line"></uni-section>
 		</uni-swipe-action>
 
 		<uni-fab ref="fab" :pattern="pattern" :horizontal="horizontal" :vertical="vertical" :direction="direction" @trigger="trigger"
@@ -12,26 +13,17 @@
 			<view class="uni-tip">
 				<text class="uni-tip-title">添加该日之后的</text>
 				<view class="uni-list-cell">
-					<input class="uni-input" type="number" focus :placeholder="numberPlaceholder" @input="onKeyInput" :value="number"
+					<input class="uni-input" type="number" focus :placeholder="numberPlaceholder" @input="onKeyInput" :value="addCount"
 					 placeholder-style="color:#F76260" />
 				</view>
 
-				<!-- 				<picker mode="date" :value="nowDate" @change="bindDateChange">
-					<view class="uni-list-cell">
-						<text class="uni-input">{{ nowDate }}</text>
-					</view>
-				</picker> -->
-
 				<radio-group class="radio-group" name="radio" @change="radioChange">
-					<label>
-						<radio value="1" checked="true" color="#24CACA" /><text>日</text>
+					<label v-for="(item, index) in items" :key="item.value">
+						<radio :value="item.value" :checked="index === current" color="#24CACA" />
+						<text>{{item.name}}</text>
 					</label>
-					<label>
-						<radio value="2" color="#24CACA" /><text>月</text>
-					</label>
-					<label>
-						<radio value="3" color="#24CACA" /><text>年</text>
-					</label>
+
+
 				</radio-group>
 
 				<view class="uni-tip-group-button">
@@ -66,11 +58,26 @@
 			uniPopup
 		},
 		computed: {
-			...mapState(['openid']),
+			...mapState(['openid', 'selectedDetail', 'selected']),
 		},
 		data() {
 			return {
 				selectedItem: {},
+				items: [{
+						value: '日',
+						name: '日',
+						checked: 'true'
+					},
+					{
+						value: '月',
+						name: '月',
+					},
+					{
+						value: '年',
+						name: '年'
+					}
+				],
+				current: 0,
 				options1: [{
 					text: '修改',
 					style: {
@@ -99,72 +106,65 @@
 				}],
 				showtip: false,
 				type: '',
-				nowDate: '',
-				number: '',
 				numberPlaceholder: '数量不能为空',
-				numberPlaceholdercolor: 'color:#7A7E83',
-				nowDateTemp: '',
-				numberTemp: '',
 				isUpdate: false,
-				updateInfoId: '',
-				updateIndex: '',
-				selectRadio: 1,
+				updateInfoDetailId: '',
+				addCount: '',
+				addCountTemp: '',
+				dateType: '日',
+				dateTypeTemp: '',
 			}
 		},
 		onReady() {
-			this.customLoad()
+			this.customLoad();
 		},
 		methods: {
-			...mapActions(['getCurrentMonthSelected']),
-			...mapMutations(['setSelectedDate']),
+			...mapActions(['getCurrentMonthSelected', 'addInfoDetail', 'updateInfoDetail', 'deleteInfoDetail']),
+			...mapMutations(['setSelectedDate', 'setSelectedDetail']),
 			async customLoad() {
-				this.nowDate = helper.getDate().fullDate;
-				await this.getCurrentMonthSelected()
+				await this.getCurrentMonthSelected();
 			},
 			swipeclick(e) {
 				var listIndex;
 				if (e.listIndex == undefined) {
 					listIndex = e;
-				}else{
+				} else {
 					listIndex = e.listIndex;
 				}
-				
-				this.setSelectedDate(this.getDate(this.selectedItem.infoDetail[listIndex].date))
-				// console.log('daymarkdetail', this.getDate(this.selectedItem.infoDetail[e.listIndex].date))
+
+				this.setSelectedDate(this.getDate(this.selectedItem.infoDetail[listIndex].date));
 				uni.switchTab({
 					url: '/pages/tabBar/calendar/calendar'
-				})
+				});
 			},
 			bindClick(e) {
 				var listIndex;
 				if (e.listIndex == undefined) {
 					listIndex = e;
-				}else{
+				} else {
 					listIndex = e.listIndex;
 				}
-				
+
 				switch (e.content.text) {
 					case '修改':
 						{
-							this.isUpdate = true
-							// console.log(e)
-							// console.log(this.selected)
-							this.updateInfoId = this.selected[listIndex].info.infoId
-							this.nowDate = this.nowDateTemp = this.getDate(this.selected[listIndex].infoDetail)
-							this.tittle = this.tittleTemp = this.selected[listIndex].info.name
-							// console.log('this.nowDateTemp', this.nowDateTemp)
-							// console.log('this.tittleTemp', this.tittleTemp)
-							this.content[e.index].active = true
-							this.togglePopup('center', 'tip')
-							this.showtip = true
+							console.log(this.selectedItem.infoDetail[listIndex]);
+							this.isUpdate = true;
+							this.updateInfoDetailId = this.selectedItem.infoDetail[listIndex].infoDetailId;
+							this.addCount = this.addCountTemp = this.selectedItem.infoDetail[listIndex].count;
+							this.dateType = this.dateTypeTemp = this.selectedItem.infoDetail[listIndex].type;
+							this.setCurrent(this.dateType);
+							this.content[e.index].active = true;
+							this.togglePopup('center', 'tip');
+							this.showtip = true;
 							break;
 						}
 					case '删除':
 						{
 							var para = {
-								'infoId': this.selected[listIndex].info.infoId
-							}
-							this.callDeleteInfo(para);
+								'infoDetailId': this.selectedItem.infoDetail[listIndex].infoDetailId
+							};
+							this.callDeleteInfoDetail(para);
 							break;
 						}
 					default:
@@ -174,69 +174,70 @@
 			},
 			clickFab() {
 				if (this.showtip) {
-					this.showtip = false
-					this.$refs.fab.close()
-					this.tittle = ''
-					this.tittleTemp = ''
-					this.nowDate = helper.getDate().fullDate;
-					this.nowDateTemp = ''
-					this.updateInfoId = ''
+					this.showtip = false;
+					this.$refs.fab.close();
+					this.addCount = '';
+					this.addCountTemp = '';
+					this.dateType = '';
+					this.dateTypeTemp = '';
+					this.updateInfoDetailId = '';
 				} else {
-					this.togglePopup('center', 'tip')
+					this.togglePopup('center', 'tip');
 				}
 			},
 			trigger(e) {
-				this.content[e.index].active = !e.item.active
-				this.togglePopup('center', 'tip')
+				this.content[e.index].active = !e.item.active;
+				this.togglePopup('center', 'tip');
 			},
 			change(e) {
 				if (!e.show) {
-					this.showtip = false
+					this.showtip = false;
 				}
 			},
 			togglePopup(type, open) {
-				this.type = type
-				this['show' + open] = true
+				this.type = type;
+				this['show' + open] = true;
 			},
-			async callDeleteInfo(para) {
-				await this.deleteInfo(para)
+			async callDeleteInfoDetail(para) {
+				await this.deleteInfoDetail(para);
+				this.selectedItem = this.selected[this.selectedDetail];
 			},
 			async cancel(type, isConfirm) {
 				if (isConfirm) {
-					if (this.tittle != '') {
+					if (this.addCount != '') {
 						if (this.isUpdate) {
-							if (this.nowDate != this.nowDateTemp || this.tittle != this.tittleTemp) {
+							if (this.addCount != this.addCountTemp || this.dateType != this.dateTypeTemp) {
 								var para = {
-									'infoId': this.updateInfoId,
-								}
-								if (this.nowDate != this.nowDateTemp)
-									para.date = this.nowDate
-								if (this.tittle != this.tittleTemp)
-									para.name = this.tittle
-								this.isUpdate = false
-								await this.updateInfo(para)
+									'infoId': this.selectedItem.info.infoId,
+									'infoDetailId': this.updateInfoDetailId,
+									'addCount': this.addCount,
+									'type': this.dateType,
+								};
+								this.isUpdate = false;
+								await this.updateInfoDetail(para);
 							}
 						} else {
 							var para = {
-								'name': this.tittle,
-								'date': this.nowDate
-							}
-							await this.addInfo(para);
+								'infoId': this.selectedItem.info.infoId,
+								'addCount': this.addCount,
+								'dateType': this.dateType
+							};
+							await this.addInfoDetail(para);
+							this.selectedItem = this.selected[this.selectedDetail];
 						}
 					}
 				}
-				if (!isConfirm || this.tittle != '') {
-					this['show' + type] = false
-					this.$refs.fab.close()
+				if (!isConfirm || this.addCount != '') {
+					this['show' + type] = false;
+					this.$refs.fab.close();
 				}
-				this.tittle = ''
-				this.tittleTemp = ''
-				this.nowDate = helper.getDate().fullDate;
-				this.nowDateTemp = ''
-				this.updateInfoId = ''
+				this.addCount = '';
+				this.addCountTemp = '';
+				this.updateInfoDetailId = '';
+				this.selectedItem = this.selected[this.selectedDetail];
 			},
 			onKeyInput(e) {
-				this.number = e.detail.value;
+				this.addCount = e.detail.value;
 			},
 			bindDateChange(e) {
 				this.nowDate = e.detail.value;
@@ -246,18 +247,24 @@
 					return helper.getDate(new Date(date)).fullDate;
 				}
 			},
-			radioChange(e) {
-				console.log(e)
+			radioChange(evt) {
+				this.setCurrent(evt.target.value);
+				this.dateType = evt.target.value;
+			},
+			setCurrent(value) {
+				for (let i = 0; i < this.items.length; i++) {
+					if (this.items[i].value === value) {
+						this.current = i;
+						break;
+					}
+				}
 			}
 		},
 		onLoad(option) {
-			console.log(option)
-			console.log(decodeURIComponent(option.item))
-			this.selectedItem = JSON.parse(decodeURIComponent(option.item));
+			this.selectedItem = this.selected[this.selectedDetail];
 			uni.setNavigationBarTitle({
 				title: this.selectedItem.info.name
-			})
-			// console.log('this.selectedItem', this.selectedItem)
+			});
 		}
 	}
 </script>

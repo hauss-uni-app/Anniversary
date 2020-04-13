@@ -28,51 +28,38 @@
 			return {
 				itemArr: '',
 				showSection: false,
-				content: 'aaaaaaaaaaaa',
 				type: 'bottom',
 				showCalendar: false
 			}
 		},
 		computed: {
-			...mapState(['selected', 'selectedDate', 'openid'])
+			...mapState(['selected', 'selectedDate'])
 		},
 		methods: {
 			...mapActions(['getCurrentMonthSelected']),
 			...mapMutations(['setSelectedDate']),
 			async getCurrentMonth(date) {
-				// console.log('aaaaaaa')
 				if (this.selectedDate != '') {
-					// console.log("onLoad-this.selectedDate", this.$refs);
 					if (this.$refs.calendar.setDate != undefined)
 						this.$refs.calendar.setDate(this.selectedDate);
 					this.setSelectedDate('');
-				} else if (this.$refs.calendar.setDate != undefined)
-					this.$refs.calendar.setDate();
+				}
 			},
 			change(e) {
-				// console.log(e)
-				this.showSection = false
+				this.showSection = false;
 				if (e.extraInfo != undefined) {
-					this.showSection = true
-					this.itemArr = e.extraInfo
-					// console.log('hauss test', e.extraInfo)
+					this.showSection = true;
+					this.itemArr = e.extraInfo;
 				}
 			},
 
 		},
 		onLoad() {
-			// this.$nextTick(() => {
-			// console.log("$nextTick11", this.selectedDate);
-			// this.getCurrentMonth(new Date().toLocaleDateString());
-			this.getCurrentMonthSelected()
-			this.showCalendar = true
-			// })
+			this.getCurrentMonthSelected();
+			this.showCalendar = true;
 		},
 		onShow() {
-			// uni.startPullDownRefresh();
-			console.log('onShow')
-			this.getCurrentMonth(new Date().toLocaleDateString())
-			// uni.stopPullDownRefresh();
+			this.getCurrentMonth(new Date().toLocaleDateString());
 		}
 	};
 </script>
