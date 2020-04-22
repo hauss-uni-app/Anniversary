@@ -113,10 +113,25 @@
 				});
 				// #endif
 				// #ifdef APP-PLUS || MP-WEIXIN || H5
-				this.setUserInfo(e.detail.userInfo);
-				this.getCurrentMonthSelected();
-				this.loginProgress = false
+				// console.log('e.detail',e.detail)
+				// this.setUserInfo(e.detail.userInfo);
+				// this.loginProgress = false
+				uni.login({
+					provider: 'weixin',
+					scopes: 'auth_user', //支付宝小程序需设置授权类型
+					success: (loginRes) => {
+						console.log('loginRes',loginRes)
+						this.login('weixin');
+						this.getInfo();
+						this.loginProgress = false
+					},
+					fail: (err) => {
+						this.clearStorage();
+						this.loginProgress = false
+					}
+				});
 				// #endif
+				this.getCurrentMonthSelected();
 			},
 			// 获取用户信息 API 在小程序可直接使用，在 5+App 里面需要先登录才能调用
 			getInfo() {
@@ -189,6 +204,7 @@
 					content: ' ',
 					showCancel: false
 				})
+				this.getCurrentMonthSelected();
 			}
 		},
 		onShow() {

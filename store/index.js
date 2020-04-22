@@ -8,7 +8,8 @@ const store = new Vuex.Store({
 		allData: [],
 		hasLogin: false,
 		loginProvider: "",
-		openid: "oRrdQt82aW4Jj-bEP1QhE3DKR9Ew",
+		// 
+		openid: "",
 		testvuex: false,
 		selected: [],
 		colorIndex: 0,
@@ -16,7 +17,7 @@ const store = new Vuex.Store({
 			nickName: "您未登录",
 			avatarUrl: "/static/calender_press.png"
 		},
-		url: "http://120.25.215.190/",
+		url: "https://www.455666.xyz/",
 		version: 0,
 		selectedDate: '',
 		selectedDetail: [],
@@ -63,6 +64,7 @@ const store = new Vuex.Store({
 			state.selected = [];
 		},
 		setUserInfo(state, userInfo) {
+			console.log('userInfo',userInfo)
 			uni.setStorage({
 				key: 'userInfo',
 				data: userInfo,
@@ -151,6 +153,7 @@ const store = new Vuex.Store({
 									}).catch(err => {
 										uni.showModal({
 											content: err.errMsg,
+											showCancel: false
 										});
 										reject(err)
 									});
@@ -163,6 +166,7 @@ const store = new Vuex.Store({
 				}).catch(err => {
 					uni.showModal({
 						content: err.errMsg,
+						showCancel: false
 					});
 					reject(err)
 				});
@@ -197,6 +201,7 @@ const store = new Vuex.Store({
 				}).catch(err => {
 					uni.showModal({
 						content: err.errMsg,
+						showCancel: false
 					});
 					reject(err)
 				});
@@ -234,7 +239,7 @@ const store = new Vuex.Store({
 				}).catch(err => {
 					uni.showModal({
 						content: err.errMsg,
-						// showCancel: false
+						showCancel: false
 					});
 					reject(err)
 				});
@@ -271,7 +276,7 @@ const store = new Vuex.Store({
 				}).catch(err => {
 					uni.showModal({
 						content: err.errMsg,
-						// showCancel: false
+						showCancel: false
 					});
 					reject(err)
 				});
@@ -341,7 +346,7 @@ const store = new Vuex.Store({
 				}).catch(err => {
 					uni.showModal({
 						content: err.errMsg,
-						// showCancel: false
+						showCancel: false
 					});
 					reject(err)
 				});
@@ -377,7 +382,7 @@ const store = new Vuex.Store({
 				}).catch(err => {
 					uni.showModal({
 						content: err.errMsg,
-						// showCancel: false
+						showCancel: false
 					});
 					reject(err)
 				});
