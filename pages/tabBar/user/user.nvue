@@ -7,10 +7,10 @@
 			</view>
 		</view>
 		<!-- #ifndef APP-NVUE -->
-			<button v-if="!hasLogin" open-type="getUserInfo" lang="zh_CN" @getuserinfo="toLogin" withCredentials="true">登录</button>
+		<button v-if="!hasLogin" open-type="getUserInfo" lang="zh_CN" @getuserinfo="toLogin" withCredentials="true">登录</button>
 		<!-- #endif -->
 		<!-- #ifdef APP-NVUE -->
-			<button v-if="!hasLogin" @tap="toLogin">登陆</button>
+		<button v-if="!hasLogin" @tap="toLogin">登陆</button>
 		<!-- #endif -->
 		<button v-if="hasLogin" @tap="clearStorage">退出登录</button>
 	</view>
@@ -50,8 +50,8 @@
 		},
 
 		methods: {
-			...mapMutations(['login', 'setUserInfo', 'getUserInfo', 'clearUserInfo', 'logout']),
-			...mapActions(['getCurrentMonthSelected']),
+			...mapMutations(['login', 'setOpenId', 'setUserInfo', 'getUserInfo', 'clearUserInfo', 'logout']),
+			...mapActions(['getCurrentMonthSelected', 'getOpenIdAsync']),
 			toLogin(e) {
 				this.loginProgress = true
 				uni.getStorage({
@@ -60,6 +60,15 @@
 						if (!res.data) {
 							this.getProvider(e);
 						} else {
+							uni.getStorage({
+								key: 'openid',
+								success: (res) => {
+									this.setOpenId(res.data);
+								},
+								fail: () => {
+									this.clearStorage();
+								}
+							});
 							uni.getStorage({
 								key: 'userInfo',
 								success: (res) => {
@@ -71,7 +80,8 @@
 									this.clearStorage();
 									this.loginProgress = false
 								}
-							})
+							});
+
 						}
 					},
 					fail: () => {
@@ -86,19 +96,21 @@
 				console.log(e.detail.rawData)
 			},
 			getProvider(e) {
-				// #ifdef APP-NVUE
 				uni.getProvider({
 					service: 'oauth',
 					success: (res) => {
 						// console.log(res.provider)
 						if (~res.provider.indexOf('weixin')) {
-							console.log('loginRes',loginRes)
 							uni.login({
 								provider: 'weixin',
 								scopes: 'auth_user', //支付宝小程序需设置授权类型
 								success: (loginRes) => {
 									this.login('weixin');
 									this.getInfo();
+									console.log('loginRes', loginRes)
+									if (loginRes.code != undefined) {
+										this.callGetOpenIdAsync(loginRes.code );
+									}
 									this.loginProgress = false
 								},
 								fail: (err) => {
@@ -112,27 +124,13 @@
 						this.loginProgress = false
 					}
 				});
-				// #endif
-				// #ifdef APP-PLUS || MP-WEIXIN || H5
-				// console.log('e.detail',e.detail)
-				// this.setUserInfo(e.detail.userInfo);
-				// this.loginProgress = false
-				uni.login({
-					provider: 'weixin',
-					scopes: 'auth_user', //支付宝小程序需设置授权类型
-					success: (loginRes) => {
-						console.log('loginRes',loginRes)
-						this.login('weixin');
-						this.getInfo();
-						this.loginProgress = false
-					},
-					fail: (err) => {
-						this.clearStorage();
-						this.loginProgress = false
-					}
-				});
-				// #endif
 				this.getCurrentMonthSelected();
+			},
+			async callGetOpenIdAsync(code){
+				var para = {
+					'code': code,
+				};
+				await getOpenIdAsync(para);
 			},
 			// 获取用户信息 API 在小程序可直接使用，在 5+App 里面需要先登录才能调用
 			getInfo() {

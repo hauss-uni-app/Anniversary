@@ -17,7 +17,8 @@ const store = new Vuex.Store({
 			nickName: "您未登录",
 			avatarUrl: "/static/calender_press.png"
 		},
-		url: "https://www.455666.xyz/",
+		url: "https://localhost:44320/",
+		// url: "https://www.455666.xyz/",
 		version: 0,
 		selectedDate: '',
 		selectedDetail: [],
@@ -63,6 +64,36 @@ const store = new Vuex.Store({
 			state.openid = null;
 			state.selected = [];
 		},
+		setOpenId(state, openid){
+			console.log('openid', openid)
+			uni.setStorage({
+				key: 'openid',
+				data: openid,
+				success: (res) => {
+					state.openid = openid
+				},
+				fail: () => {
+					uni.showModal({
+						title: '储存数据失败!',
+						showCancel: false
+					})
+				}
+			})
+		},
+		getOpenId(state, openid){
+			uni.getStorage({
+				key: 'openid',
+				success: (res) => {
+					state.openid = res.data
+				},
+				fail: () => {
+					uni.showModal({
+						title: '请登录',
+						showCancel: false
+					})
+				}
+			})
+		},
 		setUserInfo(state, userInfo) {
 			console.log('userInfo', userInfo)
 			uni.setStorage({
@@ -85,7 +116,6 @@ const store = new Vuex.Store({
 				key: 'userInfo',
 				success: (res) => {
 					state.userInfo = res.data
-					state.openid = res.data.openId
 					state.hasLogin = true
 				},
 				fail: () => {
@@ -387,26 +417,29 @@ const store = new Vuex.Store({
 				});
 			})
 		},
-		getOpenId: async function({
+		getOpenIdAsync: async function({
 			commit,
 			state
 		}, para) {
-			var requestUrl = state.url + 'api/User/GetOpenId?code=' + state.code;
-			
+			var requestUrl = state.url + 'api/User/GetOpenId';
+			console.log(para.code)
 			uni.request({
 				url: requestUrl,
+				data: JSON.stringify(para.code),
 				method: 'POST',
 				header: {
-					'content-type': 'application/x-www-form-urlencoded',
+					'content-type': 'application/json',
 				}
 			}).then(res => {
 				if (res != undefined) {
 					if (res[1] != undefined) {
 						if (res[1].data != undefined) {
 							if (res[1].data.response != undefined) {
-								const selected = res[1].data.response
-								commit("setCurrentMonthSelected", selected)
-								resolve(selected)
+								const response = res[1].data.response
+								if(response.openid != undefined){
+									commit("setOpenId", response.openid)
+								}
+								resolve(response)
 							}
 						}
 					}
