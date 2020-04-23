@@ -64,14 +64,13 @@ const store = new Vuex.Store({
 			state.selected = [];
 		},
 		setUserInfo(state, userInfo) {
-			console.log('userInfo',userInfo)
+			console.log('userInfo', userInfo)
 			uni.setStorage({
 				key: 'userInfo',
 				data: userInfo,
 				success: (res) => {
 					state.hasLogin = true
 					state.userInfo = userInfo
-					state.openid = userInfo.openId
 				},
 				fail: () => {
 					uni.showModal({
@@ -388,6 +387,39 @@ const store = new Vuex.Store({
 				});
 			})
 		},
+		getOpenId: async function({
+			commit,
+			state
+		}, para) {
+			var requestUrl = state.url + 'api/User/GetOpenId?code=' + state.code;
+			
+			uni.request({
+				url: requestUrl,
+				method: 'POST',
+				header: {
+					'content-type': 'application/x-www-form-urlencoded',
+				}
+			}).then(res => {
+				if (res != undefined) {
+					if (res[1] != undefined) {
+						if (res[1].data != undefined) {
+							if (res[1].data.response != undefined) {
+								const selected = res[1].data.response
+								commit("setCurrentMonthSelected", selected)
+								resolve(selected)
+							}
+						}
+					}
+				}
+				resolve(null)
+			}).catch(err => {
+				uni.showModal({
+					content: err.errMsg,
+					showCancel: false
+				});
+				reject(err)
+			});
+		}
 	},
 })
 
