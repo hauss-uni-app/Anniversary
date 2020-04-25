@@ -28,7 +28,7 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "狗狗记日",
+		"navigationBarTitleText": "狗狗纪念日",
 		"navigationBarBackgroundColor": "#24CACA",
 		"backgroundColor": "#F8F8F8"
 	},
@@ -51,8 +51,8 @@
 			},
 			{
 				"pagePath": "pages/tabBar/user/user",
-				// "iconPath": "static/mark_press.png",
-				// "selectedIconPath": "static/mark.png",
+				"iconPath": "static/me_press.png",
+				"selectedIconPath": "static/me.png",
 				"text": "我的"
 			}
 		]

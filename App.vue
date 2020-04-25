@@ -1,11 +1,13 @@
 <script>
 	import {
-		mapActions
+		mapActions,
+		mapMutations
 	} from 'vuex'
 
 	export default {
 		onLaunch: function() {
-			this.getCurrentMonthSelected()
+			this.getOpenId()
+			// this.getCurrentMonthSelected()
 			console.log('App Launch')
 		},
 		onShow: function() {
@@ -15,6 +17,7 @@
 			console.log('App Hide')
 		},
 		methods: {
+			...mapMutations(['getOpenId']),
 			...mapActions(['getCurrentMonthSelected']),
 		},
 	}

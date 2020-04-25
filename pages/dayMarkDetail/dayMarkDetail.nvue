@@ -248,8 +248,9 @@
 				}
 			},
 			radioChange(evt) {
-				this.setCurrent(evt.target.value);
-				this.dateType = evt.target.value;
+				this.setCurrent(evt.detail.value);
+				this.dateType = evt.detail.value;
+				// console.log(evt)
 			},
 			setCurrent(value) {
 				for (let i = 0; i < this.items.length; i++) {

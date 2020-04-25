@@ -15,10 +15,10 @@ const store = new Vuex.Store({
 		colorIndex: 0,
 		userInfo: {
 			nickName: "您未登录",
-			avatarUrl: "/static/calender_press.png"
+			avatarUrl: "/static/dog.png"
 		},
-		url: "https://localhost:44320/",
-		// url: "https://www.455666.xyz/",
+		// url: "https://localhost:44320/",
+		url: "https://www.455666.xyz/",
 		version: 0,
 		selectedDate: '',
 		selectedDetail: [],
@@ -46,7 +46,8 @@ const store = new Vuex.Store({
 				data: false,
 				success: (res) => {
 					state.hasLogin = false;
-					state.openid = null
+					state.openid = null;
+					state.selected = [];
 				},
 				fail: () => {
 					uni.showModal({
@@ -59,18 +60,19 @@ const store = new Vuex.Store({
 		clearUserInfo(state) {
 			state.userInfo = {
 				nickName: "您未登录",
-				avatarUrl: "/static/calender_press.png"
+				avatarUrl: "/static/dog.png"
 			};
-			state.openid = null;
+			state.openid = null;;
 			state.selected = [];
 		},
-		setOpenId(state, openid){
-			console.log('openid', openid)
+		setOpenId(state, openid) {
+			console.log('setOpenId', openid)
 			uni.setStorage({
 				key: 'openid',
 				data: openid,
 				success: (res) => {
-					state.openid = openid
+					state.openid = openid;
+					store.dispatch('getCurrentMonthSelected')
 				},
 				fail: () => {
 					uni.showModal({
@@ -80,11 +82,13 @@ const store = new Vuex.Store({
 				}
 			})
 		},
-		getOpenId(state, openid){
+		getOpenId(state, openid) {
 			uni.getStorage({
 				key: 'openid',
 				success: (res) => {
+					console.log('getOpenId', res)
 					state.openid = res.data
+					store.commit('getUserInfo')
 				},
 				fail: () => {
 					uni.showModal({
@@ -102,6 +106,9 @@ const store = new Vuex.Store({
 				success: (res) => {
 					state.hasLogin = true
 					state.userInfo = userInfo
+					state.openid = userInfo.openId
+					store.commit('setOpenId', userInfo.openId)
+					store.dispatch('getCurrentMonthSelected')
 				},
 				fail: () => {
 					uni.showModal({
@@ -144,62 +151,68 @@ const store = new Vuex.Store({
 		}, date) {
 			return await new Promise((resolve, reject) => {
 				//check whether local version is different from the server`s
-				uni.request({
-					url: state.url + 'api/User/Version',
-					data: state.openid,
-					sslVerify: false
-				}).then(res => {
-					if (res != undefined) {
-						if (res[1].data != undefined) {
-							if (res[1].data.response != undefined) {
-								const version = res[1].data.response
-								if (version != state.version) {
-									//get lastest info
-									var para = {}
-									para.openId = state.openid
-									if (date != undefined) {
-										// para.date = date
-									}
-									uni.request({
-										url: state.url + 'api/User',
-										// url: 'http://192.168.15.107/api/User',
-										// url: 'http://120.25.215.190/api/User',
-										data: para,
-										sslVerify: false,
-									}).then(res => {
-										if (res != undefined) {
-											if (res[1].data != undefined) {
-												if (res[1].data.response != undefined) {
-													const selected = res[1].data.response
+				console.log('getCurrentMonthSelected', state.openid)
+				if (state.openid != null) {
+					uni.request({
+						url: state.url + 'api/User/Version',
+						data: state.openid,
+						sslVerify: false
+					}).then(res => {
+						if (res != undefined) {
+							if (res[1].data != undefined) {
+								if (res[1].data.response != undefined) {
+									const version = res[1].data.response
+									if (version != state.version) {
+										//get lastest info
+										var para = {}
+										para.openId = state.openid
+										if (date != undefined) {
+											// para.date = date
+										}
+										uni.request({
+											url: state.url + 'api/User',
+											// url: 'http://192.168.15.107/api/User',
+											// url: 'http://120.25.215.190/api/User',
+											data: para,
+											sslVerify: false,
+										}).then(res => {
+											if (res != undefined) {
+												if (res[1].data != undefined) {
+													if (res[1].data.response != undefined) {
+														const selected = res[1].data.response
 
-													//set local select and version
-													commit("setCurrentMonthSelected", selected)
-													resolve(selected)
+														//set local select and version
+														commit("setCurrentMonthSelected", selected)
+														resolve(selected)
+													}
 												}
 											}
-										}
-										resolve(null)
-									}).catch(err => {
-										uni.showModal({
-											content: err.errMsg,
-											showCancel: false
+											resolve(null)
+										}).catch(err => {
+											uni.showModal({
+												content: err.errMsg,
+												showCancel: false
+											});
+											reject(err)
 										});
-										reject(err)
-									});
-								} else {
-									resolve(state.selected)
+									} else {
+										resolve(state.selected)
+									}
 								}
 							}
 						}
-					}
-				}).catch(err => {
-					uni.showModal({
-						content: err.errMsg,
-						showCancel: false
+					}).catch(err => {
+						uni.showModal({
+							content: err.errMsg,
+							showCancel: false
+						});
+						reject(err)
 					});
-					reject(err)
-				});
+				} else {
+					commit("setCurrentMonthSelected", [])
+				}
 			})
+
 		},
 
 		addInfo: async function({
@@ -207,6 +220,8 @@ const store = new Vuex.Store({
 			state
 		}, para) {
 			return await new Promise((resolve, reject) => {
+				console.log('addinfo', state.openid)
+
 				var requestUrl = state.url + 'api/Info?openId=' + state.openid + '&name=' + para.name + '&date=' +
 					new Date(para.date).toLocaleDateString();
 				uni.request({
@@ -418,39 +433,43 @@ const store = new Vuex.Store({
 			})
 		},
 		getOpenIdAsync: async function({
+			dispatch,
 			commit,
 			state
 		}, para) {
-			var requestUrl = state.url + 'api/User/GetOpenId';
-			console.log(para.code)
+			var requestUrl = state.url + 'api/User/GetOpenId?code=' + para.code;
+			console.log(para)
 			uni.request({
 				url: requestUrl,
-				data: JSON.stringify(para.code),
 				method: 'POST',
 				header: {
-					'content-type': 'application/json',
+					'content-type': 'application/x-www-form-urlencoded',
 				}
 			}).then(res => {
+				console.log("res", res)
 				if (res != undefined) {
 					if (res[1] != undefined) {
 						if (res[1].data != undefined) {
 							if (res[1].data.response != undefined) {
 								const response = res[1].data.response
-								if(response.openid != undefined){
-									commit("setOpenId", response.openid)
+								if (response.openid != undefined) {
+									console.log("setOpenId", response.openid)
+									return commit("setOpenId", response.openid)
 								}
 								resolve(response)
 							}
 						}
 					}
 				}
-				resolve(null)
+				// resolve(null)
 			}).catch(err => {
 				uni.showModal({
+					title: '',
 					content: err.errMsg,
 					showCancel: false
 				});
-				reject(err)
+				console.log("getOpenIdAsync - error", err)
+				// reject(err.errMsg)
 			});
 		}
 	},

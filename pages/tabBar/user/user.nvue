@@ -45,13 +45,14 @@
 			...mapState({
 				loginProvider: state => state.loginProvider,
 				hasLogin: state => state.hasLogin,
-				userInfo: state => state.userInfo
+				userInfo: state => state.userInfo,
+				openid: state => state.openid
 			})
 		},
 
 		methods: {
-			...mapMutations(['login', 'setOpenId', 'setUserInfo', 'getUserInfo', 'clearUserInfo', 'logout']),
-			...mapActions(['getCurrentMonthSelected', 'getOpenIdAsync']),
+			...mapMutations(['login', 'setOpenId', 'setUserInfo', 'getUserInfo', 'clearUserInfo', 'logout','getOpenId']),
+			...mapActions([ 'getOpenIdAsync']),
 			toLogin(e) {
 				this.loginProgress = true
 				uni.getStorage({
@@ -61,27 +62,26 @@
 							this.getProvider(e);
 						} else {
 							uni.getStorage({
+								key: 'userInfo',
+								success: (res) => {
+									this.setUserInfo(res.data);
+									this.loginProgress = false
+								},
+								fail: () => {
+									this.clearStorage();
+									this.loginProgress = false
+								}
+							});
+							uni.getStorage({
 								key: 'openid',
 								success: (res) => {
+									console.log('openid',res)
 									this.setOpenId(res.data);
 								},
 								fail: () => {
 									this.clearStorage();
 								}
 							});
-							uni.getStorage({
-								key: 'userInfo',
-								success: (res) => {
-									this.setUserInfo(res.data);
-									this.getCurrentMonthSelected();
-									this.loginProgress = false
-								},
-								fail: () => {
-									this.clearStorage();
-									this.loginProgress = false
-								}
-							});
-
 						}
 					},
 					fail: () => {
@@ -89,11 +89,6 @@
 						this.loginProgress = false
 					}
 				})
-			},
-			onGotUserInfo(e) {
-				console.log(e.detail.errMsg)
-				console.log(e.detail.userInfo)
-				console.log(e.detail.rawData)
 			},
 			getProvider(e) {
 				uni.getProvider({
@@ -107,9 +102,9 @@
 								success: (loginRes) => {
 									this.login('weixin');
 									this.getInfo();
-									console.log('loginRes', loginRes)
 									if (loginRes.code != undefined) {
-										this.callGetOpenIdAsync(loginRes.code );
+										console.log('loginRes', loginRes)
+										this.callGetOpenIdAsync(loginRes.code);
 									}
 									this.loginProgress = false
 								},
@@ -124,13 +119,13 @@
 						this.loginProgress = false
 					}
 				});
-				this.getCurrentMonthSelected();
+
 			},
-			async callGetOpenIdAsync(code){
+			async callGetOpenIdAsync(code) {
 				var para = {
 					'code': code,
 				};
-				await getOpenIdAsync(para);
+				this.getOpenIdAsync(para);
 			},
 			// 获取用户信息 API 在小程序可直接使用，在 5+App 里面需要先登录才能调用
 			getInfo() {
@@ -138,7 +133,6 @@
 					provider: this.loginProvider,
 					success: (result) => {
 						this.setUserInfo(result.userInfo);
-						this.getCurrentMonthSelected();
 						this.loginProgress = false
 					},
 					fail: (error) => {
@@ -203,17 +197,18 @@
 					content: ' ',
 					showCancel: false
 				})
-				this.getCurrentMonthSelected();
 			}
 		},
 		onShow() {
-			if (!this.hasLogin && !this.loginProgress) {
-				uni.showModal({
-					title: '请登录',
-					content: ' ',
-					showCancel: false
-				})
-			}
+			this.getOpenId();
+			// this.getUserInfo();
+			// if (!this.hasLogin && !this.loginProgress) {
+			// 	uni.showModal({
+			// 		title: '请登录',
+			// 		content: ' ',
+			// 		showCancel: false
+			// 	})
+			// }
 		},
 	}
 </script>
