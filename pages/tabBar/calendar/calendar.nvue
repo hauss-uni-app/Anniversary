@@ -59,14 +59,18 @@
 			this.showCalendar = true;
 		},
 		onReady() {
-			console.log('onReady')
-			// this.getCurrentMonthSelected();
 			this.getCurrentMonth(new Date().toLocaleDateString());
 		},
 		onShow() {
-			console.log('show')
 			this.getCurrentMonthSelected(new Date().toLocaleDateString());
 			this.getCurrentMonth(new Date().toLocaleDateString());
+		},
+		onShareAppMessage() {
+		    return {
+		        title: '与小伙伴一起，纪念曰吧！',
+		        path: '/pages/tabBar/calendar/calendar',
+				imageUrl: 'https://gitee.com/hacop/Anniversary.Vue.js/raw/master/anniversary.png'
+		    };
 		},
 	};
 </script>

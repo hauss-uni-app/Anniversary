@@ -54,7 +54,7 @@
 			...mapMutations(['login', 'setOpenId', 'setUserInfo', 'getUserInfo', 'clearUserInfo', 'logout','getOpenId']),
 			...mapActions([ 'getOpenIdAsync']),
 			toLogin(e) {
-				this.loginProgress = true
+				this.loginProgress = true;
 				uni.getStorage({
 					key: 'hasLogin',
 					success: (res) => {
@@ -65,17 +65,16 @@
 								key: 'userInfo',
 								success: (res) => {
 									this.setUserInfo(res.data);
-									this.loginProgress = false
+									this.loginProgress = false;
 								},
 								fail: () => {
 									this.clearStorage();
-									this.loginProgress = false
+									this.loginProgress = false;
 								}
 							});
 							uni.getStorage({
 								key: 'openid',
 								success: (res) => {
-									console.log('openid',res)
 									this.setOpenId(res.data);
 								},
 								fail: () => {
@@ -86,7 +85,7 @@
 					},
 					fail: () => {
 						this.getProvider(e);
-						this.loginProgress = false
+						this.loginProgress = false;
 					}
 				})
 			},
@@ -94,7 +93,6 @@
 				uni.getProvider({
 					service: 'oauth',
 					success: (res) => {
-						// console.log(res.provider)
 						if (~res.provider.indexOf('weixin')) {
 							uni.login({
 								provider: 'weixin',
@@ -103,20 +101,19 @@
 									this.login('weixin');
 									this.getInfo();
 									if (loginRes.code != undefined) {
-										console.log('loginRes', loginRes)
 										this.callGetOpenIdAsync(loginRes.code);
 									}
-									this.loginProgress = false
+									this.loginProgress = false;
 								},
 								fail: (err) => {
 									this.clearStorage();
-									this.loginProgress = false
+									this.loginProgress = false;
 								}
 							});
 						}
 					},
 					fail: (error) => {
-						this.loginProgress = false
+						this.loginProgress = false;
 					}
 				});
 
@@ -133,10 +130,10 @@
 					provider: this.loginProvider,
 					success: (result) => {
 						this.setUserInfo(result.userInfo);
-						this.loginProgress = false
+						this.loginProgress = false;
 					},
 					fail: (error) => {
-						this.loginProgress = false
+						this.loginProgress = false;
 						let content = error.errMsg;
 						if (~content.indexOf('uni.login')) {
 							content = '请在登录页面完成登录操作';
@@ -151,7 +148,7 @@
 										content: 'Hello uni-app需要获取您的用户信息，请在设置界面打开相关权限',
 										success: (res) => {
 											if (res.confirm) {
-												uni.openSetting()
+												uni.openSetting();
 											}
 										}
 									})
@@ -188,27 +185,26 @@
 				this.userInfo = {};
 			},
 			clearStorage() {
-				uni.clearStorageSync()
-				this.clear()
-				this.clearUserInfo()
-				this.logout()
+				uni.clearStorageSync();
+				this.clear();
+				this.clearUserInfo();
+				this.logout();
 				uni.showModal({
 					title: '清除数据成功',
 					content: ' ',
 					showCancel: false
-				})
+				});
 			}
 		},
 		onShow() {
 			this.getOpenId();
-			// this.getUserInfo();
-			// if (!this.hasLogin && !this.loginProgress) {
-			// 	uni.showModal({
-			// 		title: '请登录',
-			// 		content: ' ',
-			// 		showCancel: false
-			// 	})
-			// }
+		},
+		onShareAppMessage() {
+		    return {
+		        title: '与小伙伴一起，纪念曰吧！',
+		        path: '/pages/tabBar/calendar/calendar',
+				imageUrl: 'https://gitee.com/hacop/Anniversary.Vue.js/raw/master/anniversary.png'
+		    };
 		},
 	}
 </script>
@@ -224,7 +220,7 @@
 		border-radius: 128upx;
 		width: 128upx;
 		height: 128upx;
-		padding: 10px;
+		// padding: 10px;
 	}
 
 	.userinfo-tittle-contain {

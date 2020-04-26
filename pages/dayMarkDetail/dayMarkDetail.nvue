@@ -250,7 +250,6 @@
 			radioChange(evt) {
 				this.setCurrent(evt.detail.value);
 				this.dateType = evt.detail.value;
-				// console.log(evt)
 			},
 			setCurrent(value) {
 				for (let i = 0; i < this.items.length; i++) {
@@ -266,7 +265,14 @@
 			uni.setNavigationBarTitle({
 				title: this.selectedItem.info.name
 			});
-		}
+		},
+		onShareAppMessage() {
+		    return {
+		        title: '与小伙伴一起，纪念曰吧！',
+		        path: '/pages/tabBar/calendar/calendar',
+				imageUrl: 'https://gitee.com/hacop/Anniversary.Vue.js/raw/master/anniversary.png'
+		    };
+		},
 	}
 </script>
 <style>

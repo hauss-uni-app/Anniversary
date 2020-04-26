@@ -221,7 +221,14 @@
 		},
 		onLoad() {
 			this.platform = uni.getSystemInfoSync().platform;
-		}
+		},
+		onShareAppMessage() {
+		    return {
+		        title: '与小伙伴一起，纪念曰吧！',
+		        path: '/pages/tabBar/calendar/calendar',
+				imageUrl: 'https://gitee.com/hacop/Anniversary.Vue.js/raw/master/anniversary.png'
+		    };
+		},
 	}
 </script>
 <style>
