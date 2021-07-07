@@ -28,10 +28,10 @@ class Calendar {
 
 		const preDate = this.getDate(this.date.fullDate, -1, 'month').fullDate
 		this.preweeks = this._getWeek(preDate).weeks
-		
+
 		const nextDate = this.getDate(this.date.fullDate, +1, 'month').fullDate
 		this.nextweeks = this._getWeek(nextDate).weeks
-		
+
 		this.weeks = this._getWeek(this.date.fullDate).weeks
 	}
 
@@ -104,12 +104,28 @@ class Calendar {
 			// 是否今天
 			let isDay = fullDate === nowDate
 			// 获取打点信息
-			let info = this.selected && this.selected.find((item) => {
-				if (this.dateEqual(nowDate, item.date)) {
-					return item
-				}
-			})
+			let infos = []
+			if (this.selected.length > 0) {
+				// debugger;
+				 // console.log('selected success', this.selected);
 
+				this.selected.forEach((item_info) => {
+					// console.log('item_info', item_info);
+					item_info.infoDetail.forEach((item_detail) => {
+						if (this.dateEqual(nowDate, this.getDate(new Date(item_detail.date)).fullDate)) {
+							// debugger
+							let info = {
+								info: item_info.info.name,
+								count: item_detail.count,
+								type: item_detail.type
+							};
+							infos.push(info);
+						}
+					})
+				})
+			}
+
+			// console.log('info success', info);
 			// 日期禁用
 			let disableBefore = true
 			let disableAfter = true
@@ -147,8 +163,8 @@ class Calendar {
 				disable: !disableBefore || !disableAfter,
 				isDay
 			}
-			if (info) {
-				data.extraInfo = info
+			if (infos.length > 0) {
+				data.extraInfo = infos
 			}
 
 			dateArr.push(data)
@@ -175,12 +191,13 @@ class Calendar {
 	 * @param {Object} date
 	 */
 	setDate(date) {
+		// debugger
 		const preDate = this.getDate(date, -1, 'month').fullDate
 		this.preweeks = this._getWeek(preDate).weeks
-		
+
 		const nextDate = this.getDate(date, +1, 'month').fullDate
 		this.nextweeks = this._getWeek(nextDate).weeks
-		
+		// console.log('setDate', this._getWeek(date).weeks)
 		this.weeks = this._getWeek(date).weeks
 	}
 	/**
@@ -188,6 +205,7 @@ class Calendar {
 	 * @param {Object} date
 	 */
 	getInfo(date) {
+		// debugger
 		if (!date) {
 			date = new Date()
 		}
@@ -258,13 +276,13 @@ class Calendar {
 	 */
 	setSelectInfo(data, value) {
 		this.selected = value
-		
+
 		const preDate = this.getDate(data, -1, 'month').fullDate
 		this.preweeks = this._getWeek(preDate).weeks
-		
+
 		const nextDate = this.getDate(data, +1, 'month').fullDate
 		this.nextweeks = this._getWeek(nextDate).weeks
-		
+		console.log('setSelectInfo', this._getWeek(data).weeks)
 		this.weeks = this._getWeek(data).weeks
 	}
 
@@ -281,13 +299,13 @@ class Calendar {
 			this.multipleStatus.before = ''
 			this.multipleStatus.after = ''
 			this.multipleStatus.data = []
-			
+
 			const preDate = this.getDate(fullDate, -1, 'month').fullDate
 			this.preweeks = this._getWeek(preDate).weeks
-			
+
 			const nextDate = this.getDate(fullDate, +1, 'month').fullDate
 			this.nextweeks = this._getWeek(nextDate).weeks
-			
+		console.log('weeks', this._getWeek(fullDate).weeks)
 			this.weeks = this._getWeek(fullDate).weeks
 		} else {
 			if (!before) {
@@ -301,10 +319,10 @@ class Calendar {
 				}
 				const preDate = this.getDate(fullDate, -1, 'month').fullDate
 				this.preweeks = this._getWeek(preDate).weeks
-				
+
 				const nextDate = this.getDate(fullDate, +1, 'month').fullDate
 				this.nextweeks = this._getWeek(nextDate).weeks
-				
+		console.log('weeks', this._getWeek(fullDate).weeks)
 				this.weeks = this._getWeek(fullDate).weeks
 			}
 		}
@@ -324,6 +342,7 @@ class Calendar {
 		} = this.getDate(dateData)
 		let firstDay = new Date(year, month - 1, 1).getDay()
 		let currentDay = new Date(year, month, 0).getDate()
+		// debugger
 		let dates = {
 			lastMonthDays: this._getLastMonthDays(firstDay, this.getDate(dateData)), // 上个月末尾几天
 			currentMonthDys: this._currentMonthDys(currentDay, this.getDate(dateData)), // 本月天数

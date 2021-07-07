@@ -11,29 +11,34 @@
 				</view>
 			</view>
 			<view class="uni-calendar__header">
-				<view class="uni-calendar__header-btn-box" @click="pre">
+				<!-- <view class="uni-calendar__header-btn-box" @click="pre">
 					<view class="uni-calendar__header-btn uni-calendar--left"></view>
-				</view>
-				<text class="uni-calendar__header-text" @click="showPicker">{{ (nowDate.year||'') +'年'+( nowDate.month||'') +'月'}}</text>
-				<view class="uni-calendar__header-btn-box" @click="next">
+				</view> -->
+				<picker mode="date" :value="nowDate.fullDate" @change="bindDateChange">
+					<view class="uni-calendar__weeks">
+						<text class="uni-input-cal">{{ (nowDate.year||'') +'年'+( nowDate.month||'') +'月 '}}</text>
+						<text class="uni-input_down-cal">▼</text>
+					</view>
+				</picker>
+
+				<!-- <view class="uni-calendar__header-btn-box" @click="next">
 					<view class="uni-calendar__header-btn uni-calendar--right"></view>
-				</view>
+				</view> -->
 				<text class="uni-calendar__backtoday" @click="backtoday">回到今天</text>
 			</view>
 			<view class="uni-calendar__weeks">
-				<view class="uni-calendar__weeks-header" v-for="(week,wIndex) in weekHeader" :key="wIndex">{{week}}</view>
+				<view class="uni-calendar__weeks-header" v-for="(week,wIndex) in weekHeader" :key="wIndex"><text class="uni-calendar__weeks-header">{{week}}</text></view>
 			</view>
 
 			<view class="uni-calendar__box">
 				<!-- <view class="uni-calendar__box-bg">
 					<text class="uni-calendar__box-bg-text">{{nowDate.month}}</text>
 				</view> -->
-				<swiper class="uni-swipper" :duration="350" :circular="true" :current="currentIndex" @change="swiperChange">
-					<!-- <swiper-item v-for="mIndex in 3" :key="mIndex"> -->
+				<swiper class="uni-swipper" :duration="100" :circular="true" :current="currentIndex" @change="swiperChange">
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in preweeks" :key="weekIndex">
-							<view class="uni-calendar__weeks-item" v-for="(preweeks,weeksIndex) in item" :key="weeksIndex">
-								<uni-calendar-item :weeks="preweeks" :calendar="precalendar" :lunar="lunar" @click="choiceDate"></uni-calendar-item>
+							<view class="uni-calendar__weeks-item" v-for="(preweeks,preweeksIndex) in item" :key="preweeksIndex">
+								<uni-calendar-item :weeks="preweeks" :calendar="precalendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
 					</swiper-item>
@@ -41,34 +46,54 @@
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in weeks" :key="weekIndex">
 							<view class="uni-calendar__weeks-item" v-for="(weeks,weeksIndex) in item" :key="weeksIndex">
-								<uni-calendar-item :weeks="weeks" :calendar="calendar" :lunar="lunar" @click="choiceDate"></uni-calendar-item>
+								<uni-calendar-item :weeks="weeks" :calendar="calendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
 					</swiper-item>
 
 					<swiper-item>
 						<view class="uni-calendar__weeks" v-for="(item,weekIndex) in nextweeks" :key="weekIndex">
-							<view class="uni-calendar__weeks-item" v-for="(nextweeks,weeksIndex) in item" :key="weeksIndex">
-								<uni-calendar-item :weeks="nextweeks" :calendar="nextcalendar" :lunar="lunar" @click="choiceDate"></uni-calendar-item>
+							<view class="uni-calendar__weeks-item" v-for="(nextweeks,nextweeksIndex) in item" :key="nextweeksIndex">
+								<uni-calendar-item :weeks="nextweeks" :calendar="nextcalendar" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
 							</view>
 						</view>
 					</swiper-item>
 				</swiper>
 			</view>
-
 		</view>
-		<w-picker mode="yearMonth" endYear="2100" :current="true" @confirm="onConfirm" ref="yearMonth" themeColor="#24CACA"></w-picker>
 	</view>
 </template>
 
 <script>
 	import Calendar from './util.js';
 	import uniCalendarItem from './uni-calendar-item.vue';
-	import wPicker from "@/components/w-picker/w-picker.vue";
+	import {
+		mapState,
+		mapMutations,
+		mapActions
+	} from 'vuex'
+
+	function getDate(type) {
+		const date = new Date();
+
+		let year = date.getFullYear();
+		let month = date.getMonth() + 1;
+		let day = date.getDate();
+
+		if (type === 'start') {
+			year = year - 60;
+		} else if (type === 'end') {
+			year = year + 2;
+		}
+		month = month > 9 ? month : '0' + month;;
+		day = day > 9 ? day : '0' + day;
+
+		return `${year}-${month}-${day}`;
+	}
+
 	export default {
 		components: {
 			uniCalendarItem,
-			wPicker
 		},
 		props: {
 			/**
@@ -77,15 +102,6 @@
 			date: {
 				type: String,
 				default: ''
-			},
-			/**
-			 * 打点日期
-			 */
-			selected: {
-				type: Array,
-				default () {
-					return []
-				}
 			},
 			/**
 			 * 是否开启阴历日期
@@ -136,17 +152,17 @@
 				calendar: {},
 				nextcalendar: {},
 				nowDate: '',
-				aniMaskShow: false
+				aniMaskShow: false,
+				pickerstartDate: getDate('start'),
+				pickerendDate: getDate('end'),
 			}
+		},
+		computed: {
+			...mapState(['selected'])
 		},
 		watch: {
 			selected(newVal) {
-				console.log("selected");
-				// this.nowDate = this.calendar = this.cale.getInfo(newVal.date)
-				// this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
-				// this.preweeks = this.cale.preweeks
-				// this.nextweeks = this.cale.nextweeks
-				// this.weeks = this.cale.weeks
+				this.setDate(this.nowDate.fullDate);
 			}
 		},
 		created() {
@@ -157,49 +173,47 @@
 				startDate: this.startDate,
 				endDate: this.endDate,
 				range: this.range,
-			})
-			this.init(this.cale.date.fullDate)
-
-
+			});
+			this.setDate(this.cale.date.fullDate);
 		},
 		methods: {
+			...mapActions(['getCurrentMonthSelected']),
 			// 取消穿透
 			clean() {},
+			setDateOuting(date) {
+				this.setDate(date);
+				return true;
+			},
 			init(date) {
 				this.months = this.cale.months;
-
-				this.weeks = this.cale.weeks
-				this.nowDate = this.calendar = this.cale.getInfo(date)
+				this.weeks = this.cale.weeks;
+				this.nowDate = this.calendar = this.cale.getInfo(date);
 				this.$nextTick(function() {
-					this.preweeks = this.cale.preweeks
-					this.nextweeks = this.cale.nextweeks
-					this.precalendar = this.calendar
-					this.nextcalendar = this.calendar
+					this.preweeks = this.cale.preweeks;
+					this.nextweeks = this.cale.nextweeks;
+					this.precalendar = this.calendar;
+					this.nextcalendar = this.calendar;
 				})
 			},
 			open() {
-				this.show = true
+				this.show = true;
 				this.$nextTick(() => {
-					this.aniMaskShow = true
+					this.aniMaskShow = true;
 				})
 			},
 			close() {
-				this.aniMaskShow = false
+				this.aniMaskShow = false;
 				this.$nextTick(() => {
 					setTimeout(() => {
-						this.show = false
+						this.show = false;
 					}, 300)
 				})
 			},
-			confirm() {
-				this.setEmit('confirm')
-				this.close()
+			change(weeks) {
+				this.setEmit('change', weeks);
 			},
-			change() {
-				if (!this.insert) return
-				this.setEmit('change')
-			},
-			setEmit(name) {
+			setEmit(name, weeks) {
+				//console.log(weeks)
 				let {
 					year,
 					month,
@@ -207,7 +221,7 @@
 					fullDate,
 					lunar,
 					extraInfo
-				} = this.calendar
+				} = weeks;
 				this.$emit(name, {
 					range: this.cale.multipleStatus,
 					year,
@@ -216,32 +230,21 @@
 					fulldate: fullDate,
 					lunar,
 					extraInfo: extraInfo || {}
-				})
+				});
 			},
 			choiceDate(weeks) {
-				if (weeks.disable) return
+				if (weeks.disable) return;
 
 				if (this.currentIndex == 0)
-					this.nowDate = this.precalendar = weeks
+					this.precalendar = weeks;
 				if (this.currentIndex == 1)
-					this.nowDate = this.calendar = weeks
+					this.calendar = weeks;
 				if (this.currentIndex == 2)
-					this.nowDate = this.nextcalendar = weeks
-
-				// 设置多选
-				// this.cale.setMultiple(this.calendar.fullDate)
-				// this.preweeks = this.cale.preweeks
-				// this.nextweeks = this.cale.nextweeks
-				// this.weeks = this.cale.weeks
-				this.$nextTick(function() {this.change()});
+					this.nextcalendar = weeks;
+				this.change(weeks);
 			},
 			backtoday() {
-				// this.lastIndex = 1
-				// this.currentIndex = 1
-				this.setDate(new Date())
-				// this.nowDate = this.calendar = this.cale.getInfo(new Date())
-				this.choiceDate(this.cale.getInfo(new Date()))
-				this.change()
+				this.setDate(new Date().toLocaleDateString());
 			},
 			pre() {
 				const {
@@ -250,11 +253,10 @@
 					month,
 					date,
 					day
-				} = this.cale.getDate(this.nowDate.fullDate, -1, 'month')
+				} = this.cale.getDate(this.nowDate.fullDate, -1, 'month');
 
-				const preDate = new Date(year, month - 1, 1)
-				this.setDate(preDate)
-				// this.change()
+				const preDate = new Date(year, month - 1, 1).toLocaleDateString();
+				this.setDate(preDate);
 			},
 			next() {
 				const {
@@ -263,56 +265,57 @@
 					month,
 					date,
 					day
-				} = this.cale.getDate(this.nowDate.fullDate, +1, 'month')
+				} = this.cale.getDate(this.nowDate.fullDate, +1, 'month');
 
-				const nextDate = new Date(year, month - 1, 1)
-				this.setDate(nextDate)
-				// this.change()
+				const nextDate = new Date(year, month - 1, 1).toLocaleDateString();
+
+				this.setDate(nextDate);
 			},
-			setDate(date) {
-				var preweeks = []
-				var nextweeks = []
-				var weeks = []
-				this.cale.setDate(date)
-				
-				if (this.currentIndex == 1) {
-					preweeks = this.cale.preweeks
-					nextweeks = this.cale.nextweeks
-					weeks = this.cale.weeks
-					this.nowDate = this.calendar = this.cale.getInfo(date)
-					this.weeks = weeks
-					this.$nextTick(function() {
-						this.preweeks = preweeks
-						this.nextweeks = nextweeks
-					})
-				} else if (this.currentIndex == 0) {
-					preweeks = this.cale.weeks
-					nextweeks = this.cale.preweeks
-					weeks = this.cale.nextweeks
-					this.nowDate= this.precalendar = this.cale.getInfo(date)
-					this.preweeks = preweeks
-					this.$nextTick(function() {
-						this.weeks = weeks
-						this.nextweeks = nextweeks
-					})
-				} else if (this.currentIndex == 2) {
-					preweeks = this.cale.nextweeks
-					nextweeks = this.cale.weeks
-					weeks = this.cale.preweeks
-					this.nowDate= this.nextcalendar = this.cale.getInfo(date)
-					this.nextweeks = nextweeks
-					this.$nextTick(function() {
-						this.weeks = weeks
-						this.preweeks = preweeks
-					})
-				}
-				
-				
+			async setDate(date) {
+				var preweeks = [];
+				var nextweeks = [];
+				var weeks = [];
 
+				this.cale.setDate(date);
+				this.cale.selected = this.selected;
+				if (this.currentIndex == 1) {
+					weeks = this.cale.weeks;
+					this.nowDate = this.calendar = this.cale.getInfo(date);
+					this.weeks = weeks;
+					this.$nextTick(function() {
+						this.change(this.calendar);
+						preweeks = this.cale.preweeks;
+						nextweeks = this.cale.nextweeks;
+						this.preweeks = preweeks;
+						this.nextweeks = nextweeks;
+					});
+				} else if (this.currentIndex == 0) {
+					preweeks = this.cale.weeks;
+
+					this.nowDate = this.precalendar = this.cale.getInfo(date);
+					this.preweeks = preweeks;
+					this.$nextTick(function() {
+						this.change(this.precalendar);
+						nextweeks = this.cale.preweeks;
+						weeks = this.cale.nextweeks;
+						this.weeks = weeks;
+						this.nextweeks = nextweeks;
+					});
+				} else if (this.currentIndex == 2) {
+					nextweeks = this.cale.weeks;
+					this.nowDate = this.nextcalendar = this.cale.getInfo(date);
+					this.nextweeks = nextweeks;
+					this.$nextTick(function() {
+						this.change(this.nextcalendar);
+						weeks = this.cale.preweeks;
+						preweeks = this.cale.nextweeks;
+						this.weeks = weeks;
+						this.preweeks = preweeks;
+					});
+				}
 			},
 			swiperChange(e) {
-				let index = e.target.current;
-				console.log(index);
+				let index = e.detail.current;
 
 				let isPrev = (index - this.lastIndex == -1 || index - this.lastIndex == 2) ? true : false;
 				this.currentIndex = index;
@@ -323,12 +326,8 @@
 				}
 				this.lastIndex = index;
 			},
-			onConfirm(val) {
-				const selectDate = new Date(val.checkArr[0] + '-' + val.checkArr[1] + '-01');
-				this.setDate(selectDate)
-			},
-			showPicker() {
-				this.$refs["yearMonth"].show();
+			bindDateChange: function(e) {
+				this.setDate(e.detail.value);
 			},
 		}
 
@@ -395,6 +394,7 @@
 		border-bottom-color: $uni-border-color;
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
+		background-color: $uni-color-primary;
 	}
 
 	.uni-calendar--fixed-top {
@@ -424,13 +424,15 @@
 		font-size: 12px;
 		border-top-left-radius: 25px;
 		border-bottom-left-radius: 25px;
-		color: $uni-text-color;
-		background-color: $uni-bg-color-hover;
+		color: #333;
+		background-color: #f1f1f1;
+		// align-items: center;
+		// -webkit-box-pack: center;
 	}
 
 	.uni-calendar__header-text {
 		text-align: center;
-		width: 100px;
+		// width: 100px;
 		font-size: $uni-font-size-base;
 		color: $uni-text-color;
 	}
@@ -459,10 +461,12 @@
 
 	.uni-calendar--left {
 		transform: rotate(-45deg);
+		border-color: white;
 	}
 
 	.uni-calendar--right {
 		transform: rotate(135deg);
+		border-color: white;
 	}
 
 
@@ -479,9 +483,12 @@
 		justify-content: center;
 		align-items: center;
 		font-size: $uni-font-size-base;
-		color: $uni-color-primary;
 		margin-bottom: 5px;
 		margin-top: 5px;
+	}
+
+	.uni-calendar__weeks-header {
+		color: $uni-color-primary;
 	}
 
 	.uni-calendar__weeks-item {
@@ -515,7 +522,7 @@
 	}
 
 	.uni-swipper {
-		height: 329px;
+		height: 500rpx;
 	}
 
 	.uni-calendar-item__weeks-box {
@@ -526,5 +533,18 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+	}
+
+	.uni-input-cal {
+		font-weight: bold;
+		color: white;
+		font-size: 18px;
+	}
+
+	.uni-input_down-cal {
+		font-weight: bold;
+		color: white;
+		font-size: 10px;
+		margin-top: 5px;
 	}
 </style>

@@ -1,61 +1,82 @@
 <template>
 	<view v-if="showCalendar">
-		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected"/>
+		<uni-calendar ref="calendar" :insert="true" :lunar="true" @change="change" :selected="selected" />
+		<view class="content">
+			<view class="uni-navigate-item" v-for="(item, index) in itemArr" :key="index">
+				<uni-section class="uni-navigate-text" v-if="showSection" :title="item.info" :subTitle="item.count+' '+ item.type"
+				 type="line"></uni-section>
+			</view>
+		</view>
 	</view>
-	<uni-popup :show="showpopup" :type="type" @change="change"><text class="popup-content">{{ content }}</text></uni-popup>
 </template>
 
 <script>
-	import uniCalendar from '@/components/uni-calendar/uni-calendar.vue';
-	import uniPopup from '@/components/uni-popup/uni-popup.vue';
+	import uniCalendar from '@/components/uni-calendar/uni-calendar.vue'
+	import uniSection from '@/components/uni-section/uni-section.vue'
+	import {
+		mapState,
+		mapMutations,
+		mapActions
+	} from 'vuex'
+
 	export default {
 		components: {
-			uniCalendar
+			uniCalendar,
+			uniSection
 		},
 		data() {
 			return {
-				showCalendar: false,
-				selected: [{
-						date: '2019-08-20',
-						info: '打卡'
-					},
-					{
-						date: '2019-08-21',
-						info: '签到',
-						data: {
-							custom: '自定义信息',
-							name: '自定义消息头'
-						}
-					},
-					{
-						date: '2019-08-22',
-						info: '已打卡'
-					},
-					{
-						date: '2019-11-21',
-						info: '签到',
-						data: {
-							custom: '自定义信息',
-							name: '自定义消息头'
-						}
-					}
-				]
+				itemArr: '',
+				showSection: false,
+				type: 'bottom',
+				showCalendar: false
 			}
 		},
-		onReady() {
-			this.$nextTick(() => {
-				this.showCalendar = true
-				console.log("$nextTick");
-			})
+		computed: {
+			...mapState(['selected', 'selectedDate'])
 		},
 		methods: {
+			...mapActions(['getCurrentMonthSelected']),
+			...mapMutations(['setSelectedDate']),
+			async getCurrentMonth(date) {
+				if (this.selectedDate != '') {
+					if (this.$refs.calendar.setDate != undefined)
+						this.$refs.calendar.setDate(this.selectedDate);
+					this.setSelectedDate('');
+				}
+			},
 			change(e) {
-				console.log(e);
-			}
-		}
+				this.showSection = false;
+				if (e.extraInfo != undefined) {
+					this.showSection = true;
+					this.itemArr = e.extraInfo;
+				}
+			},
+
+		},
+		onLoad() {
+			this.getCurrentMonthSelected();
+			this.showCalendar = true;
+		},
+		onReady() {
+			this.getCurrentMonth(new Date().toLocaleDateString());
+		},
+		onShow() {
+			this.getCurrentMonthSelected(new Date().toLocaleDateString());
+			this.getCurrentMonth(new Date().toLocaleDateString());
+		},
+		onShareAppMessage() {
+		    return {
+		        title: '与小伙伴一起，纪念曰吧！',
+		        path: '/pages/tabBar/calendar/calendar',
+				imageUrl: 'https://gitee.com/hacop/Anniversary.Vue.js/raw/master/anniversary.png'
+		    };
+		},
 	};
 </script>
 
 <style>
-
+	.content {
+		margin-top: 50px;
+	}
 </style>

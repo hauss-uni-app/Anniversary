@@ -1,51 +1,69 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
-			"path": "pages/tabBar/calendar/calendar",
+			"path": "pages/tabBar/calendar/calendar"
+			// "style": {
+			// 	// "navigationBarTitleText": "日历"
+			// 	"enablePullDownRefresh": true
+			// }
+		},
+		{
+			"path": "pages/tabBar/dayMark/dayMark"
+			// "style": {
+			// 	"navigationBarTitleText": "明细"
+			// }
+		},
+		{
+			"path": "pages/dayMarkDetail/dayMarkDetail",
 			"style": {
-				"navigationBarTitleText": "Anniversary"
+				"navigationBarTitleText": "dayMarkDetailPage"
 			}
 		},
 		{
-			"path": "pages/tabBar/dayMark/dayMark",
-			"style": {
-				"navigationBarTitleText": "Anniversary"
-			}
+			"path": "pages/tabBar/user/user"
+			// "style": {
+			// 	"navigationBarTitleText": "明细"
+			// }
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "Anniversary",
+		"navigationBarTitleText": "纪念曰",
 		"navigationBarBackgroundColor": "#24CACA",
 		"backgroundColor": "#F8F8F8"
 	},
-	"tabBar":{
-		"color": "#7A7E83",
-		"selectedColor": "#007AFF",
-		"borderStyle": "black",
-		"backgroundColor": "#F8F8F8",
+	"tabBar": {
+		"color": "#e0e0e0",
+		"selectedColor": "#24CACA",
+		"borderStyle": "white",
+		"backgroundColor": "#FFFFFF",
 		"list": [{
 				"pagePath": "pages/tabBar/calendar/calendar",
-				"iconPath": "static/component.png",
-				"selectedIconPath": "static/componentHL.png",
-				"text": "Calendar"
+				"iconPath": "static/calender_press.png",
+				"selectedIconPath": "static/calender.png",
+				"text": " 日历"
 			},
 			{
 				"pagePath": "pages/tabBar/dayMark/dayMark",
-				"iconPath": "static/component.png",
-				"selectedIconPath": "static/componentHL.png",
-				"text": "DayMark"
-			}]
-	},
-	"condition" : { //模式配置，仅开发期间生效
-		"current": 0, //当前激活的模式(list 的索引项)
-		"list": [
+				"iconPath": "static/mark_press.png",
+				"selectedIconPath": "static/mark.png",
+				"text": "明细"
+			},
 			{
-				"name": "", //模式名称
-				"path": "", //启动页面，必选
-				"query": "" //启动参数，在页面的onLoad函数里面得到
+				"pagePath": "pages/tabBar/user/user",
+				"iconPath": "static/me_press.png",
+				"selectedIconPath": "static/me.png",
+				"text": "我的"
 			}
 		]
+	},
+	"condition": { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [{
+			"name": "", //模式名称
+			"path": "", //启动页面，必选
+			"query": "" //启动参数，在页面的onLoad函数里面得到
+		}]
 	}
-	
+
 }

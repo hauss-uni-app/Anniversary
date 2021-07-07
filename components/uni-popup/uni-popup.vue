@@ -2,7 +2,7 @@
 	<view v-if="showPopup" class="uni-popup" @touchmove.stop.prevent="clear">
 		<view class="uni-popup__mask" :class="[ani+'-mask', animation ? 'mask-ani' : '']" @click="close(true)" />
 		<view class="uni-popup__wrapper" :class="[type,ani+'-content', animation ? 'content-ani' : '']" @click="close(true)">
-			<view class="uni-popup__wrapper-box" @click.stop="clear">
+			<view class="uni-popup__wrapper-box" @click.stop="clear" @click="showKeyBoard">
 				<slot />
 			</view>
 		</view>
@@ -36,7 +36,8 @@
 		data() {
 			return {
 				ani: '',
-				showPopup: false
+				showPopup: false,
+				isInput: false
 			}
 		},
 		watch: {
@@ -65,6 +66,12 @@
 				})
 			},
 			close(type) {
+
+				if (!this.isInput) {
+					uni.hideKeyboard();
+				}
+
+				this.isInput = false;
 				if (!this.maskClick && type) return
 				this.$emit('change', {
 					show: false
@@ -75,6 +82,9 @@
 						this.showPopup = false
 					}, 300)
 				})
+			},
+			showKeyBoard() {
+				this.isInput = true;
 			}
 		}
 	}
@@ -82,7 +92,12 @@
 <style scoped>
 	.uni-popup {
 		position: fixed;
+		/* #ifdef H5 */
 		top: var(--window-top);
+		/* #endif */
+		/* #ifndef H5 */
+		top: 0;
+		/* #endif */
 		bottom: 0;
 		left: 0;
 		right: 0;
@@ -150,6 +165,7 @@
 		align-items: center;
 		transform: scale(1.2);
 		opacity: 0;
+		padding-bottom: 200px;
 	}
 
 	.uni-popup__wrapper-box {

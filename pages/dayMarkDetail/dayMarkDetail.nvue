@@ -1,0 +1,342 @@
+<template>
+	<view>
+		<uni-swipe-action v-for="(item,index) in selectedItem.infoDetail" :key="index" :options="options1" :listIndex="index"
+		 @click="bindClick" @swipeclick="swipeclick">
+			<uni-section class="uni-navigate-text" v-if="true" :title="item.count+' '+ item.type" :subTitle="getDate(item.date)"
+			 type="line"></uni-section>
+		</uni-swipe-action>
+
+		<uni-fab ref="fab" :pattern="pattern" :horizontal="horizontal" :vertical="vertical" :direction="direction" @trigger="trigger"
+		 @clickFab="clickFab" />
+
+		<uni-popup :show="showtip" :type="type" :mask-click="false" @change="change">
+			<view class="uni-tip">
+				<text class="uni-tip-title">添加该日之后的</text>
+				<view class="uni-list-cell">
+					<input class="uni-input" type="number" focus :placeholder="numberPlaceholder" @input="onKeyInput" :value="addCount"
+					 placeholder-style="color:#F76260" />
+				</view>
+
+				<radio-group class="radio-group" name="radio" @change="radioChange">
+					<label v-for="(item, index) in items" :key="item.value">
+						<radio :value="item.value" :checked="index === current" color="#24CACA" />
+						<text>{{item.name}}</text>
+					</label>
+
+
+				</radio-group>
+
+				<view class="uni-tip-group-button">
+					<text class="uni-tip-button" @click="cancel('tip',false)">取消</text>
+					<text class="uni-tip-button" @click="cancel('tip',true)">确定</text>
+				</view>
+			</view>
+		</uni-popup>
+	</view>
+</template>
+
+<script>
+	import uniList from '@/components/uni-list/uni-list.vue'
+	import uniListItem from '@/components/uni-list-item/uni-list-item.vue'
+	import uniSwipeAction from '@/components/uni-swipe-action/uni-swipe-action.vue'
+	import uniSection from '@/components/uni-section/uni-section.vue'
+	import uniFab from '@/components/uni-fab/uni-fab.vue'
+	import uniPopup from '@/components/uni-popup/uni-popup.vue'
+	import helper from '@/common/helper.js';
+	import {
+		mapState,
+		mapMutations,
+		mapActions
+	} from 'vuex'
+	export default {
+		components: {
+			uniSwipeAction,
+			uniList,
+			uniListItem,
+			uniSection,
+			uniFab,
+			uniPopup
+		},
+		computed: {
+			...mapState(['openid', 'selectedDetail', 'selected']),
+		},
+		data() {
+			return {
+				selectedItem: {},
+				items: [{
+						value: '日',
+						name: '日',
+						checked: 'true'
+					},
+					{
+						value: '月',
+						name: '月',
+					},
+					{
+						value: '年',
+						name: '年'
+					}
+				],
+				current: 0,
+				options1: [{
+					text: '修改',
+					style: {
+						backgroundColor: '#24CACA'
+					}
+				}, {
+					text: '删除',
+					style: {
+						backgroundColor: '#dd524d'
+					}
+				}],
+				horizontal: 'left',
+				vertical: 'bottom',
+				direction: 'vertical',
+				pattern: {
+					color: '#7A7E83',
+					backgroundColor: '#fff',
+					selectedColor: '#7A7E83',
+					buttonColor: '#24CACA'
+				},
+				content: [{
+					iconPath: '/static/component.png',
+					selectedIconPath: '/static/component.png',
+					text: '记日',
+					active: false
+				}],
+				showtip: false,
+				type: '',
+				numberPlaceholder: '数量不能为空',
+				isUpdate: false,
+				updateInfoDetailId: '',
+				addCount: '',
+				addCountTemp: '',
+				dateType: '日',
+				dateTypeTemp: '',
+			}
+		},
+		onReady() {
+			this.customLoad();
+		},
+		methods: {
+			...mapActions(['getCurrentMonthSelected', 'addInfoDetail', 'updateInfoDetail', 'deleteInfoDetail']),
+			...mapMutations(['setSelectedDate', 'setSelectedDetail']),
+			async customLoad() {
+				await this.getCurrentMonthSelected();
+			},
+			swipeclick(e) {
+				var listIndex;
+				if (e.listIndex == undefined) {
+					listIndex = e;
+				} else {
+					listIndex = e.listIndex;
+				}
+
+				this.setSelectedDate(this.getDate(this.selectedItem.infoDetail[listIndex].date));
+				uni.switchTab({
+					url: '/pages/tabBar/calendar/calendar'
+				});
+			},
+			bindClick(e) {
+				var listIndex;
+				if (e.listIndex == undefined) {
+					listIndex = e;
+				} else {
+					listIndex = e.listIndex;
+				}
+
+				switch (e.content.text) {
+					case '修改':
+						{
+							console.log(this.selectedItem.infoDetail[listIndex]);
+							this.isUpdate = true;
+							this.updateInfoDetailId = this.selectedItem.infoDetail[listIndex].infoDetailId;
+							this.addCount = this.addCountTemp = this.selectedItem.infoDetail[listIndex].count;
+							this.dateType = this.dateTypeTemp = this.selectedItem.infoDetail[listIndex].type;
+							this.setCurrent(this.dateType);
+							this.content[e.index].active = true;
+							this.togglePopup('center', 'tip');
+							this.showtip = true;
+							break;
+						}
+					case '删除':
+						{
+							var para = {
+								'infoDetailId': this.selectedItem.infoDetail[listIndex].infoDetailId
+							};
+							this.callDeleteInfoDetail(para);
+							break;
+						}
+					default:
+						break;
+				}
+
+			},
+			clickFab() {
+				if (this.showtip) {
+					this.showtip = false;
+					this.$refs.fab.close();
+					this.addCount = '';
+					this.addCountTemp = '';
+					this.dateType = '';
+					this.dateTypeTemp = '';
+					this.updateInfoDetailId = '';
+				} else {
+					this.togglePopup('center', 'tip');
+				}
+			},
+			trigger(e) {
+				this.content[e.index].active = !e.item.active;
+				this.togglePopup('center', 'tip');
+			},
+			change(e) {
+				if (!e.show) {
+					this.showtip = false;
+				}
+			},
+			togglePopup(type, open) {
+				this.type = type;
+				this['show' + open] = true;
+			},
+			async callDeleteInfoDetail(para) {
+				await this.deleteInfoDetail(para);
+				this.selectedItem = this.selected[this.selectedDetail];
+			},
+			async cancel(type, isConfirm) {
+				if (isConfirm) {
+					if (this.addCount != '') {
+						if (this.isUpdate) {
+							if (this.addCount != this.addCountTemp || this.dateType != this.dateTypeTemp) {
+								var para = {
+									'infoId': this.selectedItem.info.infoId,
+									'infoDetailId': this.updateInfoDetailId,
+									'addCount': this.addCount,
+									'type': this.dateType,
+								};
+								this.isUpdate = false;
+								await this.updateInfoDetail(para);
+							}
+						} else {
+							var para = {
+								'infoId': this.selectedItem.info.infoId,
+								'addCount': this.addCount,
+								'dateType': this.dateType
+							};
+							await this.addInfoDetail(para);
+							this.selectedItem = this.selected[this.selectedDetail];
+						}
+					}
+				}
+				if (!isConfirm || this.addCount != '') {
+					this['show' + type] = false;
+					this.$refs.fab.close();
+				}
+				this.addCount = '';
+				this.addCountTemp = '';
+				this.updateInfoDetailId = '';
+				this.selectedItem = this.selected[this.selectedDetail];
+			},
+			onKeyInput(e) {
+				this.addCount = e.detail.value;
+			},
+			bindDateChange(e) {
+				this.nowDate = e.detail.value;
+			},
+			getDate(date) {
+				if (date.length > 0) {
+					return helper.getDate(new Date(date)).fullDate;
+				}
+			},
+			radioChange(evt) {
+				this.setCurrent(evt.detail.value);
+				this.dateType = evt.detail.value;
+			},
+			setCurrent(value) {
+				for (let i = 0; i < this.items.length; i++) {
+					if (this.items[i].value === value) {
+						this.current = i;
+						break;
+					}
+				}
+			}
+		},
+		onLoad(option) {
+			this.selectedItem = this.selected[this.selectedDetail];
+			uni.setNavigationBarTitle({
+				title: this.selectedItem.info.name
+			});
+		},
+		onShareAppMessage() {
+		    return {
+		        title: '与小伙伴一起，纪念曰吧！',
+		        path: '/pages/tabBar/calendar/calendar',
+				imageUrl: 'https://gitee.com/hacop/Anniversary.Vue.js/raw/master/anniversary.png'
+		    };
+		},
+	}
+</script>
+<style>
+	/* 提示窗口 */
+	.uni-tip {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		flex-direction: column;
+		/* #endif */
+		padding: 15px;
+		width: 300px;
+		background-color: #fff;
+		border-radius: 10px;
+	}
+
+	.uni-tip-title {
+		text-align: center;
+		font-weight: bold;
+		font-size: 16px;
+		color: #333;
+	}
+
+	.uni-tip-content {
+		/* padding: 15px;
+ */
+		font-size: 14px;
+		color: #666;
+	}
+
+	.uni-tip-group-button {
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		flex-direction: row;
+		margin-top: 20px;
+	}
+
+	.uni-tip-button {
+		flex: 1;
+		text-align: center;
+		font-size: 14px;
+		color: #3b4144;
+	}
+
+	.uni-icon-clear {
+		color: #999;
+	}
+
+	.uni-input {
+		height: 40px;
+		font-size: 15px;
+	}
+
+	.with-fun {
+		/* -webkit-box-orient: horizontal; */
+		/* flex-direction: row; */
+	}
+
+	.title {
+		/* padding: 10upx 25upx; */
+	}
+
+	.radio-group {
+		padding: 10px 0px 0px 10px;
+		font-size: 15px;
+	}
+</style>>
